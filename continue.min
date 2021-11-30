@@ -1,0 +1,21 @@
+function main;
+beginparams
+endparams
+beginlocals
+
+i : integer;
+
+endlocals
+beginbody
+
+  i := 0;
+  while i <= 10 beginloop
+    i := i + 1;
+    if i > 3 then
+      continue;
+    endif;
+
+    write i;
+  endloop;
+
+endbody
