@@ -1,0 +1,17 @@
+function main;
+beginparams
+endparams
+beginlocals
+
+i : integer;
+
+endlocals
+beginbody
+
+  while i < 10 beginloop
+    continue;   ## NOTE: Line 14 is OK
+  endloop;
+
+  continue;  ## NOTE: Line 17 is NOT OK. this SHOULD be an error
+
+endbody

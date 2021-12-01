@@ -1,7 +1,7 @@
 
 make:
 		bison -v -d --file-prefix=mini_l mini_l.y
-		flex mini_l.l
+		flex mini_l.lex
 		g++ -std=c++11 -g -o my_compiler lex.yy.c mini_l.tab.c -lfl
 
 
