@@ -98,7 +98,6 @@
 Program: FunctionList
     {
       $$ = new nonTerm();
-      // main declaration check
       if (!mainCheck) {
         yyerror("\"main\" function not definied in program.");
       }
@@ -132,7 +131,6 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
       $$ = new nonTerm();
       stringstream ss;
 
-      // check if function is main
       if ($2->code == "main") {
         mainCheck = true;
       }
@@ -161,7 +159,6 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
       stringstream ss;
       
       ss << $2->code << endl;
-      // FIXME send each ident up through ret_name and print out "= ident, $0 \n = ident2, $1, ..."
       string ident;
       int paramNum = 0;
       for (unsigned i = 0; i < $2->ret_name.length(); ++i) {
@@ -197,7 +194,6 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
   ;
 FunctionBody: BEGIN_BODY StatementList END_BODY
     {
-      // Error 9 of 9: Using continue statement outside a loop
       if (continueCheck($2->code)) {
         cout << "Error: continue statement not within a loop." << endl;
         exit(1);
@@ -227,7 +223,7 @@ DeclarationList: DeclarationList Declaration SEMICOLON
     {
       $$ = new nonTerm();
       $$->code = $1->code;
-      $$->ret_name = $1->ret_name; // pass identlist up
+      $$->ret_name = $1->ret_name; 
     }
   ;
 
@@ -238,7 +234,6 @@ Declaration: IdentifierList COLON INTEGER
       stringstream ss, var;
       string currVar = "";
 
-      // ss << ". ";
       for (unsigned i = 0; i < $1->code.length(); ++i) {
         if ($1->code.at(i) == ',') {
           ss << ". " << currVar << endl;
@@ -246,7 +241,6 @@ Declaration: IdentifierList COLON INTEGER
           currVar = "";
         }
         else {
-          // ss << $1->code.at(i);
           currVar.push_back($1->code[i]);
         }
       }
@@ -257,17 +251,14 @@ Declaration: IdentifierList COLON INTEGER
       }
       
       $$->code = ss.str();
-      $$->ret_name = $1->code; // pass identlist up
+      $$->ret_name = $1->code; 
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
-      // Error 8 of 9: Declaring an array of size <= 0.
       string buffer;
       if ($5 <= 0) {
         yyerror("array size < 1");
       }
-
-      // FIXME
       $$ = new nonTerm();
       stringstream ss;
       string currVar = "";
@@ -289,7 +280,7 @@ Declaration: IdentifierList COLON INTEGER
       }
       
       $$->code = ss.str();
-      $$->ret_name = $1->code; // pass identlist up
+      $$->ret_name = $1->code;
     }
   ;
 IdentifierList: Identifier
@@ -322,12 +313,10 @@ Statement: Var ASSIGN Expression
       string assign;
 
       if ($3->ret_name != "") {
-        // assign to expression result
         ss << $3->code << endl;
         assign = $3->ret_name;
       }
       else {
-        // expression is var or num
         assign = $3->code;
       }
 
@@ -350,15 +339,14 @@ Statement: Var ASSIGN Expression
       string ifTrue = makeLabel();
       string ifFalse = makeLabel();
       stringstream ss;
-      ss << $2->code << endl; // Add BoolExpr code to the stream
-      ss << "?:= " << ifTrue << ", " << $2->ret_name << endl; // if true, go to label ifTrue
-      ss << ":= " << ifFalse << endl; // if false, send to the false label
-      ss << ": " << ifTrue << endl; // start the true branch
-      ss << $4->code << endl; // add statementlist code to the stream
-      ss << ": " << ifFalse; // add false branch label, in this case branch is empty so no new line
+      ss << $2->code << endl; 
+      ss << "?:= " << ifTrue << ", " << $2->ret_name << endl; 
+      ss << ":= " << ifFalse << endl;
+      ss << ": " << ifTrue << endl; 
+      ss << $4->code << endl; 
+      ss << ": " << ifFalse; 
 
       $$->code = ss.str();
-      // $$->ret_name = ???
     }
   | IF BoolExpr THEN StatementList ELSE StatementList ENDIF
     {
@@ -366,16 +354,15 @@ Statement: Var ASSIGN Expression
       string ifTrue = makeLabel();
       string ifFalse = makeLabel();
       stringstream ss;
-      ss << $2->code << endl; // Add BoolExpr code to the stream
-      ss << "?:= " << ifTrue << ", " << $2->ret_name << endl; // if true, go to label ifTrue
-      ss << ":= " << ifFalse << endl; // if false, send to the false label
-      ss << ": " << ifTrue << endl; // start the true branch
-      ss << $4->code << endl; // add true statementlist code to the stream
-      ss << ": " << ifFalse << endl; // add false branch label
-      ss << $6->code; // add false statementlist code - no new line because end of stream
+      ss << $2->code << endl; 
+      ss << "?:= " << ifTrue << ", " << $2->ret_name << endl; 
+      ss << ":= " << ifFalse << endl; 
+      ss << ": " << ifTrue << endl; 
+      ss << $4->code << endl; 
+      ss << ": " << ifFalse << endl; 
+      ss << $6->code; 
 
       $$->code = ss.str();
-      // $$->ret_name = ???
     }
   | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP
     {
@@ -385,17 +372,16 @@ Statement: Var ASSIGN Expression
       string endLabel = makeLabel();
       stringstream ss;
 
-      // change all continue statements to goto outputs
       string replaceContinue = ":= " + conditionalLabel;
       replaceString($4->code, "continue", replaceContinue);
 
-      ss << ": " << conditionalLabel << endl; // begin while loop
-      ss << $2->code << endl; // add condtional statements
-      ss << "?:= " << startLabel << ", " << $2->ret_name << endl; // goto start of loop if true
-      ss << ":= " << endLabel << endl; // goto end if false
+      ss << ": " << conditionalLabel << endl; 
+      ss << $2->code << endl; 
+      ss << "?:= " << startLabel << ", " << $2->ret_name << endl; 
+      ss << ":= " << endLabel << endl; 
       ss << ": " << startLabel << endl;
-      ss << $4->code << endl; // output statementlist code
-      ss << ":= " << conditionalLabel << endl; // re-evaluate loop conditions
+      ss << $4->code << endl; 
+      ss << ":= " << conditionalLabel << endl; 
       ss << ": " << endLabel;
 
       $$->code = ss.str();
@@ -407,11 +393,10 @@ Statement: Var ASSIGN Expression
       string conditionalLabel = makeLabel();
       stringstream ss;
 
-      // change all continue statements to goto outputs
       string replaceContinue = ":= " + conditionalLabel;
       replaceString($3->code, "continue", replaceContinue);
 
-      ss << ": " << startLabel << endl; // mark loop start label
+      ss << ": " << startLabel << endl; 
       ss << $3->code << endl;
       ss << ": " << conditionalLabel << endl;
       ss << $6->code << endl;
@@ -428,20 +413,19 @@ Statement: Var ASSIGN Expression
       string loopVariable = makeTemp();
       stringstream ss;
 
-      // change all continue statements to goto outputs
       string replaceContinue = ":= " + conditionalLabel;
       replaceString($12->code, "continue", replaceContinue);
       
-      ss << "= " << loopVariable << ", " << $4 << endl; // __temp__ = loop variable
+      ss << "= " << loopVariable << ", " << $4 << endl; 
       ss << ": " << conditionalLabel << endl;
-      ss << $6->code << endl; // loop condition code
-      ss << "?:= " << startLabel << ", " << $6->ret_name << endl; // go to loop start if true
-      ss << ":= " << endLabel << endl; // exit if false
+      ss << $6->code << endl; 
+      ss << "?:= " << startLabel << ", " << $6->ret_name << endl; 
+      ss << ":= " << endLabel << endl; 
       ss << ": " << startLabel << endl;
       ss << $12->code << endl;
-      ss << $10->code << endl; // increment loop variable - expression code
-      ss << "= " << loopVariable << ", " << $10->ret_name << endl; // set loop variable equal to incremental expression
-      ss << ":= " << conditionalLabel << endl; // re-evaluate loop conditions
+      ss << $10->code << endl; 
+      ss << "= " << loopVariable << ", " << $10->ret_name << endl; 
+      ss << ":= " << conditionalLabel << endl; 
       ss << ": " << endLabel;
 
       $$->code = ss.str();
@@ -497,13 +481,11 @@ Statement: Var ASSIGN Expression
       string returnOp;
 
       if ($2->ret_name != "") {
-        // $1 is var or expression
         ss << $2->code << endl;
         returnOp = $2->ret_name;
 
       }
       else {
-        // $2 is num : need to make new temp
         returnOp = makeTemp();
         ss << ". " << returnOp << endl;
         ss << "= " << returnOp << ", " << $2->code << endl;
@@ -533,12 +515,11 @@ StatementList: Statement SEMICOLON
 BoolExpr: BoolExpr OR RelationAndExpr
     {
       $$ = new nonTerm();
-      string returnName = makeTemp(); // OR statement result location
-      stringstream ss;
+      string returnName = makeTemp(); 
 
-      ss << $1->code << endl << $3->code << endl; // Add nested expression code to the stream
-      ss << ". " << returnName << endl; // Add new return name to the output
-      ss << "|| " << returnName << ", " << $1->ret_name << ", " << $3->ret_name; // Add the logical OR statement
+      ss << $1->code << endl << $3->code << endl; 
+      ss << ". " << returnName << endl; 
+      ss << "|| " << returnName << ", " << $1->ret_name << ", " << $3->ret_name; 
       
       $$->code = ss.str();
       $$->ret_name = returnName;
@@ -546,7 +527,7 @@ BoolExpr: BoolExpr OR RelationAndExpr
   | RelationAndExpr
     {
       $$ = new nonTerm();
-      $$->code = $1->code; // BoolExpr == RelationAndExpr - pass values directly
+      $$->code = $1->code; 
       $$->ret_name = $1->ret_name;
     }
   ;
@@ -554,12 +535,12 @@ BoolExpr: BoolExpr OR RelationAndExpr
 RelationAndExpr: RelationAndExpr AND RelationExpr
     {
       $$ = new nonTerm();
-      string returnName = makeTemp(); // && statement result location
+      string returnName = makeTemp(); 
 
       stringstream ss;
-      ss << $1->code << endl << $3->code << endl; // Add nested expression code to the stream
-      ss << ". " << returnName << endl; // Add new return name to the output
-      ss << "&& " << returnName << ", " << $1->ret_name << ", " << $3->ret_name; // Add the logical AND statement
+      ss << $1->code << endl << $3->code << endl; 
+      ss << ". " << returnName << endl; 
+      ss << "&& " << returnName << ", " << $1->ret_name << ", " << $3->ret_name;
       
       $$->code = ss.str();
       $$->ret_name = returnName;
@@ -567,7 +548,7 @@ RelationAndExpr: RelationAndExpr AND RelationExpr
   | RelationExpr
     {
       $$ = new nonTerm();
-      $$->code = $1->code; // RelationAndExpr == RelationExpr - pass values directly
+      $$->code = $1->code; 
       $$->ret_name = $1->ret_name;
     }
   ;
@@ -599,14 +580,12 @@ Relations: Expression Comp Expression
       string firstOp;
 
       if ($1->ret_name != "") {
-        // $1 is var or expression
         ss << $1->code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        // $1 is num
-        firstOp = $1->code; // set op to number
+        firstOp = $1->code; 
       }
 
       if ($3->ret_name != "") {
@@ -670,14 +649,12 @@ Expression: Expression ADD MultiplicativeExpr
       string firstOp;
 
       if ($1->ret_name != "") {
-        // $1 is var or expression
         ss << $1->code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        // $1 is num
-        firstOp = $1->code; // set op to number
+        firstOp = $1->code; 
       }
 
 
@@ -702,14 +679,12 @@ Expression: Expression ADD MultiplicativeExpr
       string firstOp;
 
       if ($1->ret_name != "") {
-        // $1 is var or expression
         ss << $1->code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        // $1 is num
-        firstOp = $1->code; // set op to number
+        firstOp = $1->code; 
       }
 
 
@@ -738,9 +713,9 @@ ExpressionList: ExpressionList COMMA Expression
       $$ = new nonTerm();
       stringstream scode, sret;
 
-      scode << $1->code << endl << $3->code; // build blocks of expression code
+      scode << $1->code << endl << $3->code; 
       
-      sret << $3->ret_name << "," << $3->ret_name; // append ret_name to list : ret_name1,ret_name2...
+      sret << $3->ret_name << "," << $3->ret_name; 
       
       $$->code = scode.str();
       $$->ret_name = sret.str();
@@ -766,14 +741,12 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       string firstOp;
 
       if ($1->ret_name != "") {
-        // $1 is var or expression
         ss << $1->code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        // $1 is num
-        firstOp = $1->code; // set op to number
+        firstOp = $1->code; 
       }
 
 
@@ -798,14 +771,12 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       string firstOp;
 
       if ($1->ret_name != "") {
-        // $1 is var or expression
         ss << $1->code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        // $1 is num
-        firstOp = $1->code; // set op to number
+        firstOp = $1->code;
       }
 
 
@@ -830,14 +801,12 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       string firstOp;
 
       if ($1->ret_name != "") {
-        // $1 is var or expression
         ss << $1->code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        // $1 is num
-        firstOp = $1->code; // set op to number
+        firstOp = $1->code; 
       }
 
 
@@ -868,12 +837,10 @@ Term: TermInner
       $$ = new nonTerm();
 
       if ($1->ret_name == "var") {
-        // is var
         string newTemp = makeTemp();
         stringstream ss;
         
         if ($1->isArray) {
-          // FIXME
           if ($1->code.length() > 0) {
             ss << $1->code << endl;
           }
@@ -882,7 +849,7 @@ Term: TermInner
           $$->index = $1->index;
         }
         else {
-          ss << ". " << newTemp << endl; // create new temp
+          ss << ". " << newTemp << endl; 
           ss << "= " << newTemp << ", " << $1->code;
         }
 
@@ -900,13 +867,11 @@ Term: TermInner
     }
   | SUB TermInner
     {
-      // FIXME : same as TermInner but add "- dst, 0, src" after
       $$ = new nonTerm();
       stringstream ss;
       string subTemp = makeTemp();
 
       if ($2->ret_name == "var") {
-        // is var
         string newTemp = makeTemp();
         
         if ($2->isArray) {
@@ -919,7 +884,7 @@ Term: TermInner
           $$->index = $2->index;
         }
         else {
-          ss << ". " << newTemp << endl; // create new temp
+          ss << ". " << newTemp << endl; 
           ss << "= " << newTemp << ", " << $2->code << endl;
         }
 
@@ -939,16 +904,11 @@ Term: TermInner
     }
   | Identifier L_PAREN ExpressionList R_PAREN
     {
-
-      // Error 2 of 9: Calling a function which has not been defined.
-      // checkFuncDeclared($1->code);
-
       $$ = new nonTerm();
       string newTemp = makeTemp();
       stringstream ss, sret;
 
-      ss << $3->code << endl; // add all expressions code to output
-      // iterate through $3->ret_name to find all params : ret_name1,ret_name2
+      ss << $3->code << endl; 
       string temp;
       for (unsigned i = 0; i < $3->ret_name.length(); ++i) {
         if ($3->ret_name[i] == ',') {
@@ -959,9 +919,9 @@ Term: TermInner
         temp.push_back($3->ret_name[i]);
       }
 
-      if (temp.length() > 0) { // only add to code stream if at least 1 ret_name exists
-        sret << "param " << temp << endl; // add last ret_name to output
-        ss << sret.str(); // add ret_name stream to code stream
+      if (temp.length() > 0) { 
+        sret << "param " << temp << endl;
+        ss << sret.str(); 
       }
 
       ss << ". " << newTemp << endl;
@@ -988,11 +948,10 @@ TermInner: Var
     }
   | L_PAREN Expression R_PAREN
     {
-      // $2->code == evalutated expression
       $$ = new nonTerm();
       stringstream ss;
 
-      ss << $2->code; // add expression code block to output
+      ss << $2->code; 
       $$->code = ss.str();
       $$->ret_name = $2->ret_name;
     }
@@ -1011,7 +970,6 @@ Var: Identifier
       stringstream ss;
       ss << "_" << $1->code;
 
-      // Error 1 of 9: Using a variable without having first declared it.
       checkDeclared(ss.str());
 
       $$->code = ss.str();
@@ -1031,18 +989,15 @@ Var: Identifier
       string index, code = "";
 
       if ($3->ret_name != "") {
-        // $3 is var or expression
         code = $3->code;
         index = $3->ret_name;
       }
       else {
-        // $1 is num
-        index = $3->code; // set op to number
+        index = $3->code; 
       }
 
       ss << "_" << $1->code;
 
-      // Error 1 of 9: Using a variable without having first declared it.
       checkDeclared(ss.str());
 
       $$->code = code;
@@ -1094,20 +1049,16 @@ string makeLabel() {
 
 string createVar(char* ident) {
   string newVar = string(ident);
-  // add variable to the syntax table
   return newVar;
 }
 
 string findIndex (const string &ref) {
-  // return x in _ident[xx]
   unsigned leftB = ref.find('[');
   if (leftB != string::npos) {
-    // [ exists at leftB, ] exists at ref.length() - 1
     int indexLength = ((ref.length() - 1) - leftB) - 1;
     return ref.substr(leftB + 1, indexLength);
   }
   else {
-    // return yyerror("Tried to find index in a non-array variable.");
     exit(1);
   }
 }
@@ -1133,7 +1084,6 @@ bool varDeclared(const vector<string>& symbolTable, const string& var) {
       return true;
     }
   }
-  // not found in symbol table
   return false;
 }
 
@@ -1144,7 +1094,6 @@ void addLocalVar(const string& var) {
       yyerror(errorString);
     }
   }
-  // var is not in varNames - add to varNames
   varNames.push_back(var);
 }
 
@@ -1154,7 +1103,6 @@ void checkDeclared(const string& var) {
       return;
     }
   }
-  // var has not yet been declared
   string err = "used variable \"" + var + "\" was not previously declared.";
   yyerror(err);
 }
@@ -1166,7 +1114,6 @@ void addFunction(const string& func) {
       yyerror(errorString);
     }
   }
-  // var is not in varNames - add to varNames
   funcNames.push_back(func);
 }
 
@@ -1176,7 +1123,6 @@ void checkFuncDeclared(const string& func) {
       return;
     }
   }
-  // var has not yet been declared
   string err = "called function \"" + func + "\" was not previously declared.";
   yyerror(err);
 }
