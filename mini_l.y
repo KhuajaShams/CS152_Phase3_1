@@ -516,6 +516,7 @@ BoolExpr: BoolExpr OR RelationAndExpr
     {
       $$ = new nonTerm();
       string returnName = makeTemp(); 
+      stringstream ss;
 
       ss << $1->code << endl << $3->code << endl; 
       ss << ". " << returnName << endl; 
