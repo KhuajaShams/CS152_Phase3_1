@@ -35,8 +35,8 @@
   bool isMain = false;
   extern FILE* yyin;
 
-  vector<string> funcNames;
-  vector<string> varNames;
+  vector<string> declaredFunc;
+  vector<string> declaredVar;
 %}
 %union {
   int int_val;
@@ -131,7 +131,7 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
       }
 
       addFunction($2->code);
-      varNames.clear();
+      declaredVar.clear();
 
       ss << "func " << $2->code << endl;
       
@@ -1076,18 +1076,18 @@ bool varDeclared(const vector<string>& symbolTable, const string& var) {
 }
 
 void addLocalVar(const string& var) {
-  for (int i = 0; i < varNames.size(); i++) {
-    if (varNames.at(i) == var) {
+  for (int i = 0; i < declaredVar.size(); i++) {
+    if (declaredVar.at(i) == var) {
       string errorString = "symbol \"" + var + "\" is multiply-defined.";
       yyerror(errorString);
     }
   }
-  varNames.push_back(var);
+  declaredVar.push_back(var);
 }
 
 void checkDeclared(const string& var) {
-  for (int i = 0; i < varNames.size(); i++) {
-    if (varNames.at(i) == var) {
+  for (int i = 0; i < declaredVar.size(); i++) {
+    if (declaredVar.at(i) == var) {
       return;
     }
   }
@@ -1096,18 +1096,18 @@ void checkDeclared(const string& var) {
 }
 
 void addFunction(const string& func) {
-  for (int i = 0; i < funcNames.size(); i++) {
-    if (funcNames.at(i) == func) {
+  for (int i = 0; i < declaredFunc.size(); i++) {
+    if (declaredFunc.at(i) == func) {
       string errorString = "function \"" + func + "\" is multiply-defined.";
       yyerror(errorString);
     }
   }
-  funcNames.push_back(func);
+  declaredFunc.push_back(func);
 }
 
 void checkFuncDeclared(const string& func) {
-  for (int i = 0; i < funcNames.size(); i++) {
-    if (funcNames.at(i) == func) {
+  for (int i = 0; i < declaredFunc.size(); i++) {
+    if (declaredFunc.at(i) == func) {
       return;
     }
   }
