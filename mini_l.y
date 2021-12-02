@@ -111,7 +111,7 @@ FunctionList: Function FunctionList
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << $1->code << endl << endl << $2->code;
+      ss << $1->code << endl << $2->code;
       $$->code = ss.str();
     }
   | Function
