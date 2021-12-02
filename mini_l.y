@@ -326,12 +326,9 @@ Statement: Var ASSIGN Expression
       string trueLabel = createLabel();
       string falseLabel = createLabel();
       stringstream ss;
-      ss << $2->code << endl; 
-      ss << "?:= " << trueLabel << ", " << $2->r_type << endl; 
-      ss << ":= " << falseLabel << endl;
-      ss << ": " << trueLabel << endl; 
-      ss << $4->code << endl; 
-      ss << ": " << falseLabel; 
+      ss << $2->code << endl << "?:= " << trueLabel << ", " << $2->r_type << endl; 
+      ss << ":= " << falseLabel << endl << ": " << trueLabel << endl; 
+      ss << $4->code << endl << ": " << falseLabel; 
 
       $$->code = ss.str();
     }
@@ -341,12 +338,9 @@ Statement: Var ASSIGN Expression
       string trueLabel = createLabel();
       string falseLabel = createLabel();
       stringstream ss;
-      ss << $2->code << endl; 
-      ss << "?:= " << trueLabel << ", " << $2->r_type << endl; 
-      ss << ":= " << falseLabel << endl; 
-      ss << ": " << trueLabel << endl; 
-      ss << $4->code << endl; 
-      ss << ": " << falseLabel << endl; 
+      ss << $2->code << endl << "?:= " << trueLabel << ", " << $2->r_type << endl; 
+      ss << ":= " << falseLabel << endl << ": " << trueLabel << endl; 
+      ss << $4->code << endl << ": " << falseLabel << endl; 
       ss << $6->code; 
 
       $$->code = ss.str();
@@ -362,13 +356,10 @@ Statement: Var ASSIGN Expression
       string replaceContinue = ":= " + conLabel;
       replaceString($4->code, "continue", replaceContinue);
 
-      ss << ": " << conLabel << endl; 
-      ss << $2->code << endl; 
+      ss << ": " << conLabel << endl <<<< $2->code << endl; 
       ss << "?:= " << newLabel << ", " << $2->r_type << endl; 
-      ss << ":= " << endLabel << endl; 
-      ss << ": " << newLabel << endl;
-      ss << $4->code << endl; 
-      ss << ":= " << conLabel << endl; 
+      ss << ":= " << endLabel << endl << ": " << newLabel << endl;
+      ss << $4->code << endl << ":= " << conLabel << endl; 
       ss << ": " << endLabel;
 
       $$->code = ss.str();
@@ -383,10 +374,8 @@ Statement: Var ASSIGN Expression
       string replaceContinue = ":= " + conLabel;
       replaceString($3->code, "continue", replaceContinue);
 
-      ss << ": " << newLabel << endl; 
-      ss << $3->code << endl;
-      ss << ": " << conLabel << endl;
-      ss << $6->code << endl;
+      ss << ": " << newLabel << endl << $3->code << endl;
+      ss << ": " << conLabel << endl << $6->code << endl;
       ss << "?:= " << newLabel << ", " << $6->r_type;
 
       $$->code = ss.str();
@@ -403,16 +392,11 @@ Statement: Var ASSIGN Expression
       string replaceContinue = ":= " + conLabel;
       replaceString($12->code, "continue", replaceContinue);
       
-      ss << "= " << loopVariable << ", " << $4 << endl; 
-      ss << ": " << conLabel << endl;
-      ss << $6->code << endl; 
-      ss << "?:= " << newLabel << ", " << $6->r_type << endl; 
-      ss << ":= " << endLabel << endl; 
-      ss << ": " << newLabel << endl;
-      ss << $12->code << endl;
-      ss << $10->code << endl; 
-      ss << "= " << loopVariable << ", " << $10->r_type << endl; 
-      ss << ":= " << conLabel << endl; 
+      ss << "= " << loopVariable << ", " << $4 << endl << ": " << conLabel << endl;
+      ss << $6->code << endl << "?:= " << newLabel << ", " << $6->r_type << endl; 
+      ss << ":= " << endLabel << endl << ": " << newLabel << endl;
+      ss << $12->code << endl << $10->code << endl; 
+      ss << "= " << loopVariable << ", " << $10->r_type << endl << ":= " << conLabel << endl; 
       ss << ": " << endLabel;
 
       $$->code = ss.str();
@@ -474,8 +458,7 @@ Statement: Var ASSIGN Expression
       }
       else {
         returnOp = createTemp();
-        ss << ". " << returnOp << endl;
-        ss << "= " << returnOp << ", " << $2->code << endl;
+        ss << ". " << returnOp << endl << "= " << returnOp << ", " << $2->code << endl;
       }
 
       ss << "ret " << returnOp;
@@ -505,8 +488,7 @@ BoolExpr: BoolExpr OR RelationAndExpr
       string returnName = createTemp(); 
       stringstream ss;
 
-      ss << $1->code << endl << $3->code << endl; 
-      ss << ". " << returnName << endl; 
+      ss << $1->code << endl << $3->code << endl << ". " << returnName << endl; 
       ss << "|| " << returnName << ", " << $1->r_type << ", " << $3->r_type; 
       
       $$->code = ss.str();
@@ -526,8 +508,7 @@ RelationAndExpr: RelationAndExpr AND RelationExpr
       string returnName = createTemp(); 
 
       stringstream ss;
-      ss << $1->code << endl << $3->code << endl; 
-      ss << ". " << returnName << endl; 
+      ss << $1->code << endl << $3->code << endl << ". " << returnName << endl; 
       ss << "&& " << returnName << ", " << $1->r_type << ", " << $3->r_type;
       
       $$->code = ss.str();
@@ -554,8 +535,7 @@ RelationExpr: Relations
       string notTemp = createTemp();
 
       stringstream ss;
-      ss << $2->code << endl;
-      ss << "! " << notTemp << ", " << $2->r_type;
+      ss << $2->code << endl << "! " << notTemp << ", " << $2->r_type;
       $$->code = ss.str();
       $$->r_type = notTemp;
     }
@@ -577,8 +557,7 @@ Relations: Expression Comp Expression
       }
 
       if ($3->r_type != "") {
-        ss << $3->code << endl;
-        ss << ". " << compResult << endl;
+        ss << $3->code << endl << ". " << compResult << endl;
         ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
@@ -595,8 +574,7 @@ Relations: Expression Comp Expression
       string trueTemp = createTemp();
       stringstream ss;
 
-      ss << ". " << trueTemp << endl;
-      ss << "= " << trueTemp << ", 1";
+      ss << ". " << trueTemp << endl << "= " << trueTemp << ", 1";
       $$->code = ss.str();
       $$->r_type = trueTemp;
     }
@@ -632,7 +610,7 @@ Comp: EQ {/* pass value directly as $$ */}
 Expression: Expression ADD MultiplicativeExpr
     {
       $$ = new n_Terminal();
-      string addResult = createTemp();
+      string add_result = createTemp();
       stringstream ss;
       string firstOp;
 
@@ -647,17 +625,16 @@ Expression: Expression ADD MultiplicativeExpr
 
 
       if ($3->r_type != "") {
-        ss << $3->code << endl;
-        ss << ". " << addResult << endl;
-        ss << "+ " << addResult << ", " << firstOp << ", " << $3->r_type;  
+        ss << $3->code << endl << ". " << add_result << endl;
+        ss << "+ " << add_result << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
-        ss << ". " << addResult << endl;
-        ss << "+ " << addResult << ", " << firstOp << ", " << $3->code;
+        ss << ". " << add_result << endl;
+        ss << "+ " << add_result << ", " << firstOp << ", " << $3->code;
       }
 
       $$->code = ss.str();
-      $$->r_type = addResult;
+      $$->r_type = add_result;
     }
   | Expression SUB MultiplicativeExpr
     {
@@ -677,8 +654,7 @@ Expression: Expression ADD MultiplicativeExpr
 
 
       if ($3->r_type != "") {
-        ss << $3->code << endl;
-        ss << ". " << subResult << endl;
+        ss << $3->code << endl << ". " << subResult << endl;
         ss << "- " << subResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
@@ -799,8 +775,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
 
 
       if ($3->r_type != "") {
-        ss << $3->code << endl;
-        ss << ". " << modResult << endl;
+        ss << $3->code << endl << ". " << modResult << endl;
         ss << "% " << modResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
@@ -835,8 +810,7 @@ Term: TermInner
           $$->index = $1->index;
         }
         else {
-          ss << ". " << newTemp << endl; 
-          ss << "= " << newTemp << ", " << $1->code;
+          ss << ". " << newTemp << endl << "= " << newTemp << ", " << $1->code;
         }
 
         $$->code = ss.str();
@@ -870,12 +844,10 @@ Term: TermInner
           $$->index = $2->index;
         }
         else {
-          ss << ". " << newTemp << endl; 
-          ss << "= " << newTemp << ", " << $2->code << endl;
+          ss << ". " << newTemp << endl << "= " << newTemp << ", " << $2->code << endl;
         }
 
-        ss << ". " << subTemp << endl;
-        ss << "- " << subTemp << ", 0, " << newTemp;
+        ss << ". " << subTemp << endl << "- " << subTemp << ", 0, " << newTemp;
 
         $$->code = ss.str();
         $$->r_type = subTemp;
