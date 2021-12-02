@@ -239,7 +239,6 @@ Declaration: IdentifierList COLON INTEGER
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
-      string buffer;
       if ($5 <= 0) {
         yyerror("array is not of size");
       }
@@ -296,24 +295,24 @@ Statement: Var ASSIGN Expression
     {
       $$ = new n_Terminal();
       stringstream ss;
-      string assign;
+      string ass;
 
       if ($3->r_type != "") {
         ss << $3->code << endl;
-        assign = $3->r_type;
+        ass = $3->r_type;
       }
       else {
-        assign = $3->code;
+        ass = $3->code;
       }
 
       if ($1->boolArray) {
         if ($1->code.length() > 0) {
           ss << $1->code << endl;
         }
-        ss << "[]= " << $1->var << ", " << $1->index << ", " << assign;
+        ss << "[]= " << $1->var << ", " << $1->index << ", " << ass;
       }
       else {
-        ss << "= " << $1->code << ", " << assign;
+        ss << "= " << $1->code << ", " << ass;
       }
 
       $$->code = ss.str();
