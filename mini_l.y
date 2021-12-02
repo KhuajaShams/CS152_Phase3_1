@@ -3,7 +3,7 @@
   using namespace std;
   
   struct nonTerm {
-    string code;
+    char* code;
     string ret_name;
     bool isArray;
     string var;
