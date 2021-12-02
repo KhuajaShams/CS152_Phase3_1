@@ -26,12 +26,8 @@
   void replaceString(string&, const string&, const string&);
   void 
 (const string&);
-  bool varDeclared(const vector<string>&, const string&);
   bool isMain = false;
   extern FILE* yyin;
-
-  vector<string> declaredFunc;
-  vector<string> declaredVar;
 %}
 %union {
   int int_val;
@@ -124,9 +120,6 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
       if ($2->code == "main") {
         isMain = true;
       }
-
-      declaredFunc.push_back(func);
-      declaredVar.clear();
 
       ss << "func " << $2->code << endl;
       
@@ -1031,25 +1024,6 @@ void replaceString(string& str, const string& oldStr, const string& newStr) {
      str.replace(pos, oldStr.length(), newStr);
      pos += newStr.length();
   }
-}
-
-bool varDeclared(const vector<string>& symbolTable, const string& var) {
-  for (int i = 0; i < symbolTable.size(); i++) {
-    if (symbolTable.at(i) == var) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void (const string& var) {
-  for (int i = 0; i < declaredVar.size(); i++) {
-    if (declaredVar.at(i) == var) {
-      string e = "symbol \"" + var + "\" is defined.";
-      yyerror(e);
-    }
-  }
-  declaredVar.push_back(var);
 }
 
 
