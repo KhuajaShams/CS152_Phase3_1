@@ -24,10 +24,9 @@
   string createTemp();
   string createLabel();
   void replaceString(string&, const string&, const string&);
-  void 
-(const string&);
   bool isMain = false;
   extern FILE* yyin;
+
 %}
 %union {
   int int_val;
@@ -120,6 +119,7 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
       if ($2->code == "main") {
         isMain = true;
       }
+
 
       ss << "func " << $2->code << endl;
       
