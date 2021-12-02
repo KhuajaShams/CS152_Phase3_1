@@ -28,7 +28,7 @@
 
 %}
 %union {
-
+  n_Terminal* n_term;
   int int_val;
   char* str_val;
 }
@@ -393,7 +393,8 @@ Statement: Var ASSIGN Expression
       
       ss << "= " << loopVariable << ", " << $4 << endl << ": " << conLabel << endl;
       ss << $6->code << endl << "?:= " << newLabel << ", " << $6->r_type << endl; 
-      ss << ":= " << endLabel << endl << ": " << newLabel << endl << $12->code << endl << $10->code << endl; 
+      ss << ":= " << endLabel << endl << ": " << newLabel << endl;
+      ss << $12->code << endl << $10->code << endl; 
       ss << "= " << loopVariable << ", " << $10->r_type << endl << ":= " << conLabel << endl; 
       ss << ": " << endLabel;
 
