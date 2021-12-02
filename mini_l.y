@@ -102,26 +102,26 @@ Program: FunctionList
         yyerror("\"main\" function not definied in program.");
       }
 
-      $$->code = $1->code;
-      cout << $$->code << endl;
+      $$.code = $1.code;
+      cout << $$.code << endl;
     }
   | %empty 
     {
       $$ = new nonTerm();
-      cout << $$->code << endl;
+      cout << $$.code << endl;
     }
   ;
 FunctionList: Function FunctionList
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << $1->code << endl << endl << $2->code;
-      $$->code = ss.str();
+      ss << $1.code << endl << endl << $2.code;
+      $$.code = ss.str();
     }
   | Function
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      $$.code = $1.code;
     }
   ;
 
@@ -131,26 +131,26 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
       $$ = new nonTerm();
       stringstream ss;
 
-      if ($2->code == "main") {
+      if ($2.code == "main") {
         mainCheck = true;
       }
 
-      addFunction($2->code);
+      addFunction($2.code);
       varNames.clear();
 
-      ss << "func " << $2->code << endl;
+      ss << "func " << $2.code << endl;
       
-      ss << $4->code;
-      if ($4->code.length() > 0) {ss << endl;}
+      ss << $4.code;
+      if ($4.code.length() > 0) {ss << endl;}
       
-      ss << $5->code;
-      if ($5->code.length() > 0) {ss << endl;}
+      ss << $5.code;
+      if ($5.code.length() > 0) {ss << endl;}
       
-      ss << $6->code;
-      if ($6->code.length() > 0) {ss << endl;}
+      ss << $6.code;
+      if ($6.code.length() > 0) {ss << endl;}
       
       ss << "endfunc";
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
@@ -158,7 +158,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
       $$ = new nonTerm();
       stringstream ss;
       
-      ss << $2->code << endl;
+      ss << $2.code << endl;
       string ident;
       int paramNum = 0;
       for (unsigned i = 0; i < $2->ret_name.length(); ++i) {
@@ -176,7 +176,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
       }
 
 
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   | BEGIN_PARAMS END_PARAMS
     {
@@ -186,7 +186,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
 FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
     {
       $$ = new nonTerm();
-      $$->code = $2->code;
+      $$.code = $2.code;
     }
   | BEGIN_LOCALS END_LOCALS {
       $$ = new nonTerm();
@@ -194,13 +194,13 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
   ;
 FunctionBody: BEGIN_BODY StatementList END_BODY
     {
-      if (continueCheck($2->code)) {
+      if (continueCheck($2.code)) {
         cout << "Error: continue statement not within a loop." << endl;
         exit(1);
       }
 
       $$ = new nonTerm();
-      $$->code = $2->code;
+      $$.code = $2.code;
     }
   | BEGIN_BODY END_BODY
     {
@@ -212,17 +212,17 @@ DeclarationList: DeclarationList Declaration SEMICOLON
       $$ = new nonTerm();
       stringstream ss, slist;
 
-      ss << $1->code << endl << $2->code;
+      ss << $1.code << endl << $2.code;
       
       slist << $1->ret_name << "," << $2->ret_name;
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = slist.str();
     }
   | Declaration SEMICOLON
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      $$.code = $1.code;
       $$->ret_name = $1->ret_name; 
     }
   ;
@@ -234,14 +234,14 @@ Declaration: IdentifierList COLON INTEGER
       stringstream ss, var;
       string currVar = "";
 
-      for (unsigned i = 0; i < $1->code.length(); ++i) {
-        if ($1->code.at(i) == ',') {
+      for (unsigned i = 0; i < $1.code.length(); ++i) {
+        if ($1.code.at(i) == ',') {
           ss << ". " << currVar << endl;
           addLocalVar(currVar);
           currVar = "";
         }
         else {
-          currVar.push_back($1->code[i]);
+          currVar.push_back($1.code[i]);
         }
       }
 
@@ -250,8 +250,8 @@ Declaration: IdentifierList COLON INTEGER
         addLocalVar(currVar);
       }
       
-      $$->code = ss.str();
-      $$->ret_name = $1->code; 
+      $$.code = ss.str();
+      $$->ret_name = $1.code; 
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
@@ -263,14 +263,14 @@ Declaration: IdentifierList COLON INTEGER
       stringstream ss;
       string currVar = "";
 
-      for (unsigned i = 0; i < $1->code.length(); ++i) {
-        if ($1->code.at(i) == ',') {
+      for (unsigned i = 0; i < $1.code.length(); ++i) {
+        if ($1.code.at(i) == ',') {
           ss << ".[] " << currVar << ", " << to_string($5) << endl;
           addLocalVar(currVar);
           currVar = "";
         }
         else {
-          currVar.push_back($1->code[i]);
+          currVar.push_back($1.code[i]);
         }
       }
 
@@ -279,29 +279,29 @@ Declaration: IdentifierList COLON INTEGER
         addLocalVar(currVar);
       }
       
-      $$->code = ss.str();
-      $$->ret_name = $1->code;
+      $$.code = ss.str();
+      $$->ret_name = $1.code;
     }
   ;
 IdentifierList: Identifier
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << "_" << $1->code;
-      $$->code = ss.str();
+      ss << "_" << $1.code;
+      $$.code = ss.str();
     }
   | Identifier COMMA IdentifierList
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << "_" << $1->code << "," << $3->code;
-      $$->code = ss.str();
+      ss << "_" << $1.code << "," << $3.code;
+      $$.code = ss.str();
     }
   ;
 Identifier: IDENT
     {
       $$ = new nonTerm();
-      $$->code = $1;
+      $$.code = $1;
     }
   ;
 
@@ -313,25 +313,25 @@ Statement: Var ASSIGN Expression
       string assign;
 
       if ($3->ret_name != "") {
-        ss << $3->code << endl;
+        ss << $3.code << endl;
         assign = $3->ret_name;
       }
       else {
-        assign = $3->code;
+        assign = $3.code;
       }
 
       if ($1->isArray) {
-        if ($1->code.length() > 0) {
-          ss << $1->code << endl;
+        if ($1.code.length() > 0) {
+          ss << $1.code << endl;
         }
         ss << "[]= " << $1->var << ", " << $1->index << ", " << assign;
       }
       else {
-        ss << "= " << $1->code << ", " << assign;
+        ss << "= " << $1.code << ", " << assign;
       }
 
-      $$->code = ss.str();
-      $$->ret_name = $1->code;
+      $$.code = ss.str();
+      $$->ret_name = $1.code;
     }
   | IF BoolExpr THEN StatementList ENDIF
     {
@@ -339,14 +339,14 @@ Statement: Var ASSIGN Expression
       string ifTrue = makeLabel();
       string ifFalse = makeLabel();
       stringstream ss;
-      ss << $2->code << endl; 
+      ss << $2.code << endl; 
       ss << "?:= " << ifTrue << ", " << $2->ret_name << endl; 
       ss << ":= " << ifFalse << endl;
       ss << ": " << ifTrue << endl; 
-      ss << $4->code << endl; 
+      ss << $4.code << endl; 
       ss << ": " << ifFalse; 
 
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   | IF BoolExpr THEN StatementList ELSE StatementList ENDIF
     {
@@ -354,15 +354,15 @@ Statement: Var ASSIGN Expression
       string ifTrue = makeLabel();
       string ifFalse = makeLabel();
       stringstream ss;
-      ss << $2->code << endl; 
+      ss << $2.code << endl; 
       ss << "?:= " << ifTrue << ", " << $2->ret_name << endl; 
       ss << ":= " << ifFalse << endl; 
       ss << ": " << ifTrue << endl; 
-      ss << $4->code << endl; 
+      ss << $4.code << endl; 
       ss << ": " << ifFalse << endl; 
-      ss << $6->code; 
+      ss << $6.code; 
 
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP
     {
@@ -373,18 +373,18 @@ Statement: Var ASSIGN Expression
       stringstream ss;
 
       string replaceContinue = ":= " + conditionalLabel;
-      replaceString($4->code, "continue", replaceContinue);
+      replaceString($4.code, "continue", replaceContinue);
 
       ss << ": " << conditionalLabel << endl; 
-      ss << $2->code << endl; 
+      ss << $2.code << endl; 
       ss << "?:= " << startLabel << ", " << $2->ret_name << endl; 
       ss << ":= " << endLabel << endl; 
       ss << ": " << startLabel << endl;
-      ss << $4->code << endl; 
+      ss << $4.code << endl; 
       ss << ":= " << conditionalLabel << endl; 
       ss << ": " << endLabel;
 
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr
     {
@@ -394,15 +394,15 @@ Statement: Var ASSIGN Expression
       stringstream ss;
 
       string replaceContinue = ":= " + conditionalLabel;
-      replaceString($3->code, "continue", replaceContinue);
+      replaceString($3.code, "continue", replaceContinue);
 
       ss << ": " << startLabel << endl; 
-      ss << $3->code << endl;
+      ss << $3.code << endl;
       ss << ": " << conditionalLabel << endl;
-      ss << $6->code << endl;
+      ss << $6.code << endl;
       ss << "?:= " << startLabel << ", " << $6->ret_name;
 
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP
     {
@@ -414,64 +414,64 @@ Statement: Var ASSIGN Expression
       stringstream ss;
 
       string replaceContinue = ":= " + conditionalLabel;
-      replaceString($12->code, "continue", replaceContinue);
+      replaceString($12.code, "continue", replaceContinue);
       
       ss << "= " << loopVariable << ", " << $4 << endl; 
       ss << ": " << conditionalLabel << endl;
-      ss << $6->code << endl; 
+      ss << $6.code << endl; 
       ss << "?:= " << startLabel << ", " << $6->ret_name << endl; 
       ss << ":= " << endLabel << endl; 
       ss << ": " << startLabel << endl;
-      ss << $12->code << endl;
-      ss << $10->code << endl; 
+      ss << $12.code << endl;
+      ss << $10.code << endl; 
       ss << "= " << loopVariable << ", " << $10->ret_name << endl; 
       ss << ":= " << conditionalLabel << endl; 
       ss << ": " << endLabel;
 
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   | READ VarList
     {
       $$ = new nonTerm();
       stringstream ss;
       string temp = "";
-      for (unsigned i = 0; i < $2->code.length(); ++i) {
-        if ($2->code[i] == ',') {
+      for (unsigned i = 0; i < $2.code.length(); ++i) {
+        if ($2.code[i] == ',') {
           ss << ".< " << temp << endl;
           temp = "";
         }
         else {
-          temp.push_back($2->code[i]);
+          temp.push_back($2.code[i]);
         }
       }
 
       ss << ".< " << temp;
 
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   | WRITE VarList
     {
       $$ = new nonTerm();
       stringstream ss;
       string temp = "";
-      for (unsigned i = 0; i < $2->code.length(); ++i) {
-        if ($2->code[i] == ',') {
+      for (unsigned i = 0; i < $2.code.length(); ++i) {
+        if ($2.code[i] == ',') {
           ss << ".< " << temp << endl;
           temp = "";
         }
         else {
-          temp.push_back($2->code[i]);
+          temp.push_back($2.code[i]);
         }
       }
 
       ss << ".> " << temp;
 
-      $$->code = ss.str();
+      $$.code = ss.str();
     }
   | CONTINUE
     {
       $$ = new nonTerm();
-      $$->code = "continue";
+      $$.code = "continue";
     }
   | RETURN Expression
     {
@@ -481,33 +481,33 @@ Statement: Var ASSIGN Expression
       string returnOp;
 
       if ($2->ret_name != "") {
-        ss << $2->code << endl;
+        ss << $2.code << endl;
         returnOp = $2->ret_name;
 
       }
       else {
         returnOp = makeTemp();
         ss << ". " << returnOp << endl;
-        ss << "= " << returnOp << ", " << $2->code << endl;
+        ss << "= " << returnOp << ", " << $2.code << endl;
       }
 
       ss << "ret " << returnOp;
       
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = returnOp;
     }
   ;
 StatementList: Statement SEMICOLON
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      $$.code = $1.code;
     }
   | StatementList Statement SEMICOLON
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << $1->code << endl << $2->code;
-      $$->code = ss.str();
+      ss << $1.code << endl << $2.code;
+      $$.code = ss.str();
     }
   ;
 
@@ -518,17 +518,17 @@ BoolExpr: BoolExpr OR RelationAndExpr
       string returnName = makeTemp(); 
       stringstream ss;
 
-      ss << $1->code << endl << $3->code << endl; 
+      ss << $1.code << endl << $3.code << endl; 
       ss << ". " << returnName << endl; 
       ss << "|| " << returnName << ", " << $1->ret_name << ", " << $3->ret_name; 
       
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = returnName;
     }
   | RelationAndExpr
     {
       $$ = new nonTerm();
-      $$->code = $1->code; 
+      $$.code = $1.code; 
       $$->ret_name = $1->ret_name;
     }
   ;
@@ -539,17 +539,17 @@ RelationAndExpr: RelationAndExpr AND RelationExpr
       string returnName = makeTemp(); 
 
       stringstream ss;
-      ss << $1->code << endl << $3->code << endl; 
+      ss << $1.code << endl << $3.code << endl; 
       ss << ". " << returnName << endl; 
       ss << "&& " << returnName << ", " << $1->ret_name << ", " << $3->ret_name;
       
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = returnName;
     }
   | RelationExpr
     {
       $$ = new nonTerm();
-      $$->code = $1->code; 
+      $$.code = $1.code; 
       $$->ret_name = $1->ret_name;
     }
   ;
@@ -558,7 +558,7 @@ RelationAndExpr: RelationAndExpr AND RelationExpr
 RelationExpr: Relations
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      $$.code = $1.code;
       $$->ret_name = $1->ret_name;
     }
   | NOT Relations
@@ -567,9 +567,9 @@ RelationExpr: Relations
       string notTemp = makeTemp();
 
       stringstream ss;
-      ss << $2->code << endl;
+      ss << $2.code << endl;
       ss << "! " << notTemp << ", " << $2->ret_name;
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = notTemp;
     }
   ;
@@ -581,25 +581,25 @@ Relations: Expression Comp Expression
       string firstOp;
 
       if ($1->ret_name != "") {
-        ss << $1->code << endl;
+        ss << $1.code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        firstOp = $1->code; 
+        firstOp = $1.code; 
       }
 
       if ($3->ret_name != "") {
-        ss << $3->code << endl;
+        ss << $3.code << endl;
         ss << ". " << compResult << endl;
         ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->ret_name;  
       }
       else {
         ss << ". " << compResult << endl;
-        ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->code;
+        ss << $2 << " " << compResult << ", " << firstOp << ", " << $3.code;
       }
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = compResult;
     }
   | TRUE
@@ -610,7 +610,7 @@ Relations: Expression Comp Expression
 
       ss << ". " << trueTemp << endl;
       ss << "= " << trueTemp << ", 1";
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = trueTemp;
     }
   | FALSE
@@ -621,13 +621,13 @@ Relations: Expression Comp Expression
 
       ss << ". " << falseTemp << endl;
       ss << "= " << falseTemp << ", 0";
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = falseTemp;
     }
   | L_PAREN BoolExpr R_PAREN
     {
       $$ = new nonTerm();
-      $$->code = $2->code;
+      $$.code = $2.code;
       $$->ret_name = $2->ret_name;
     }
   ;
@@ -650,26 +650,26 @@ Expression: Expression ADD MultiplicativeExpr
       string firstOp;
 
       if ($1->ret_name != "") {
-        ss << $1->code << endl;
+        ss << $1.code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        firstOp = $1->code; 
+        firstOp = $1.code; 
       }
 
 
       if ($3->ret_name != "") {
-        ss << $3->code << endl;
+        ss << $3.code << endl;
         ss << ". " << addResult << endl;
         ss << "+ " << addResult << ", " << firstOp << ", " << $3->ret_name;  
       }
       else {
         ss << ". " << addResult << endl;
-        ss << "+ " << addResult << ", " << firstOp << ", " << $3->code;
+        ss << "+ " << addResult << ", " << firstOp << ", " << $3.code;
       }
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = addResult;
     }
   | Expression SUB MultiplicativeExpr
@@ -680,32 +680,32 @@ Expression: Expression ADD MultiplicativeExpr
       string firstOp;
 
       if ($1->ret_name != "") {
-        ss << $1->code << endl;
+        ss << $1.code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        firstOp = $1->code; 
+        firstOp = $1.code; 
       }
 
 
       if ($3->ret_name != "") {
-        ss << $3->code << endl;
+        ss << $3.code << endl;
         ss << ". " << subResult << endl;
         ss << "- " << subResult << ", " << firstOp << ", " << $3->ret_name;  
       }
       else {
         ss << ". " << subResult << endl;
-        ss << "- " << subResult << ", " << firstOp << ", " << $3->code;
+        ss << "- " << subResult << ", " << firstOp << ", " << $3.code;
       }
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = subResult;
     }
   | MultiplicativeExpr
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      $$.code = $1.code;
       $$->ret_name = $1->ret_name;
     }
   ;
@@ -714,17 +714,17 @@ ExpressionList: ExpressionList COMMA Expression
       $$ = new nonTerm();
       stringstream scode, sret;
 
-      scode << $1->code << endl << $3->code; 
+      scode << $1.code << endl << $3.code; 
       
       sret << $3->ret_name << "," << $3->ret_name; 
       
-      $$->code = scode.str();
+      $$.code = scode.str();
       $$->ret_name = sret.str();
     }
   | Expression
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      $$.code = $1.code;
       $$->ret_name = $1->ret_name;
     }
   | %empty
@@ -742,26 +742,26 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       string firstOp;
 
       if ($1->ret_name != "") {
-        ss << $1->code << endl;
+        ss << $1.code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        firstOp = $1->code; 
+        firstOp = $1.code; 
       }
 
 
       if ($3->ret_name != "") {
-        ss << $3->code << endl;
+        ss << $3.code << endl;
         ss << ". " << multResult << endl;
         ss << "* " << multResult << ", " << firstOp << ", " << $3->ret_name;  
       }
       else {
         ss << ". " << multResult << endl;
-        ss << "* " << multResult << ", " << firstOp << ", " << $3->code;
+        ss << "* " << multResult << ", " << firstOp << ", " << $3.code;
       }
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = multResult;
     }
   | MultiplicativeExpr DIV Term
@@ -772,26 +772,26 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       string firstOp;
 
       if ($1->ret_name != "") {
-        ss << $1->code << endl;
+        ss << $1.code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        firstOp = $1->code;
+        firstOp = $1.code;
       }
 
 
       if ($3->ret_name != "") {
-        ss << $3->code << endl;
+        ss << $3.code << endl;
         ss << ". " << divResult << endl;
         ss << "/ " << divResult << ", " << firstOp << ", " << $3->ret_name;  
       }
       else {
         ss << ". " << divResult << endl;
-        ss << "/ " << divResult << ", " << firstOp << ", " << $3->code;
+        ss << "/ " << divResult << ", " << firstOp << ", " << $3.code;
       }
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = divResult;
     }
   | MultiplicativeExpr MOD Term
@@ -802,32 +802,32 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       string firstOp;
 
       if ($1->ret_name != "") {
-        ss << $1->code << endl;
+        ss << $1.code << endl;
         firstOp = $1->ret_name;
 
       }
       else {
-        firstOp = $1->code; 
+        firstOp = $1.code; 
       }
 
 
       if ($3->ret_name != "") {
-        ss << $3->code << endl;
+        ss << $3.code << endl;
         ss << ". " << modResult << endl;
         ss << "% " << modResult << ", " << firstOp << ", " << $3->ret_name;  
       }
       else {
         ss << ". " << modResult << endl;
-        ss << "% " << modResult << ", " << firstOp << ", " << $3->code;
+        ss << "% " << modResult << ", " << firstOp << ", " << $3.code;
       }
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = modResult;
     }
   | Term
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      $$.code = $1.code;
       $$->ret_name = $1->ret_name;
     }
   ;
@@ -842,8 +842,8 @@ Term: TermInner
         stringstream ss;
         
         if ($1->isArray) {
-          if ($1->code.length() > 0) {
-            ss << $1->code << endl;
+          if ($1.code.length() > 0) {
+            ss << $1.code << endl;
           }
           ss << "=[] " << newTemp << ", " << $1->var << ", " << $1->index;
           $$->var = $1->var;
@@ -851,18 +851,18 @@ Term: TermInner
         }
         else {
           ss << ". " << newTemp << endl; 
-          ss << "= " << newTemp << ", " << $1->code;
+          ss << "= " << newTemp << ", " << $1.code;
         }
 
-        $$->code = ss.str();
+        $$.code = ss.str();
         $$->ret_name = newTemp;
       }
       else if ($1->ret_name == "num") {
-        $$->code = $1->code;
+        $$.code = $1.code;
         $$->ret_name = "";
       }
       else {
-        $$->code = $1->code;
+        $$.code = $1.code;
         $$->ret_name = $1->ret_name;
       }
     }
@@ -876,8 +876,8 @@ Term: TermInner
         string newTemp = makeTemp();
         
         if ($2->isArray) {
-          if ($2->code.length() > 0) {
-            ss << $2->code << endl;
+          if ($2.code.length() > 0) {
+            ss << $2.code << endl;
           }
           ss << "=[] " << newTemp << ", " << $2->var << ", " << $2->index << endl;
 
@@ -886,20 +886,20 @@ Term: TermInner
         }
         else {
           ss << ". " << newTemp << endl; 
-          ss << "= " << newTemp << ", " << $2->code << endl;
+          ss << "= " << newTemp << ", " << $2.code << endl;
         }
 
         ss << ". " << subTemp << endl;
         ss << "- " << subTemp << ", 0, " << newTemp;
 
-        $$->code = ss.str();
+        $$.code = ss.str();
         $$->ret_name = subTemp;
       }
       else {
         ss << ". " << subTemp << endl;
-        ss << "- " << subTemp << ", 0, " << $2->code;
+        ss << "- " << subTemp << ", 0, " << $2.code;
 
-        $$->code = ss.str();
+        $$.code = ss.str();
         $$->ret_name = subTemp;
       }
     }
@@ -909,7 +909,7 @@ Term: TermInner
       string newTemp = makeTemp();
       stringstream ss, sret;
 
-      ss << $3->code << endl; 
+      ss << $3.code << endl; 
       string temp;
       for (unsigned i = 0; i < $3->ret_name.length(); ++i) {
         if ($3->ret_name[i] == ',') {
@@ -926,16 +926,16 @@ Term: TermInner
       }
 
       ss << ". " << newTemp << endl;
-      ss << "call " << $1->code << ", " << newTemp;
+      ss << "call " << $1.code << ", " << newTemp;
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->ret_name = newTemp;
     }
   ;
 TermInner: Var
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      $$.code = $1.code;
       $$->ret_name = "var";
       $$->isArray = $1->isArray;
       $$->var = $1->var;
@@ -944,7 +944,7 @@ TermInner: Var
   | NUMBER
     {
       $$ = new nonTerm();
-      $$->code = to_string($1);
+      $$.code = to_string($1);
       $$->ret_name = "num";
     }
   | L_PAREN Expression R_PAREN
@@ -952,8 +952,8 @@ TermInner: Var
       $$ = new nonTerm();
       stringstream ss;
 
-      ss << $2->code; 
-      $$->code = ss.str();
+      ss << $2.code; 
+      $$.code = ss.str();
       $$->ret_name = $2->ret_name;
     }
   ;
@@ -969,11 +969,11 @@ Var: Identifier
 
       $$ = new nonTerm();
       stringstream ss;
-      ss << "_" << $1->code;
+      ss << "_" << $1.code;
 
       checkDeclared(ss.str());
 
-      $$->code = ss.str();
+      $$.code = ss.str();
       $$->var = ss.str();
       $$->isArray = false;
     }
@@ -990,18 +990,18 @@ Var: Identifier
       string index, code = "";
 
       if ($3->ret_name != "") {
-        code = $3->code;
+        code = $3.code;
         index = $3->ret_name;
       }
       else {
-        index = $3->code; 
+        index = $3.code; 
       }
 
-      ss << "_" << $1->code;
+      ss << "_" << $1.code;
 
       checkDeclared(ss.str());
 
-      $$->code = code;
+      $$.code = code;
       $$->isArray = true;
       $$->var = ss.str();
       $$->index = index;
@@ -1011,19 +1011,19 @@ VarList: Var
     {
       $$ = new nonTerm();
       stringstream ss;
-      $$->code = $1->var;
+      $$.code = $1->var;
       $$->isArray = $1->isArray;
     }
   | Var COMMA VarList
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << $1->var << "," << $3->code;
-      $$->code = ss.str();
+      ss << $1->var << "," << $3.code;
+      $$.code = ss.str();
 
       if ($1->isArray != $3->isArray) {
         stringstream er;
-        er << "variable \"" << $1->code << "\" is of type ";
+        er << "variable \"" << $1.code << "\" is of type ";
         if ($1->isArray) {
           er << "array.";
         }
