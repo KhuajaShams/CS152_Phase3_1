@@ -24,10 +24,9 @@
   string createTemp();
   string createLabel();
   void replaceString(string&, const string&, const string&);
-  void addNewVar(const string&);
+  void 
+(const string&);
   bool varDeclared(const vector<string>&, const string&);
-  void checkDeclared(const string&);
-  void addFunction(const string&);
   bool isMain = false;
   extern FILE* yyin;
 
@@ -126,7 +125,7 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
         isMain = true;
       }
 
-      addFunction($2->code);
+      declaredFunc.push_back(func);
       declaredVar.clear();
 
       ss << "func " << $2->code << endl;
@@ -228,7 +227,8 @@ Declaration: IdentifierList COLON INTEGER
       for (int i = 0; i < $1->code.length(); i++) {
         if ($1->code.at(i) == ',') {
           ss << ". " << currVar << endl;
-          addNewVar(currVar);
+          
+        (currVar);
           currVar = "";
         }
         else {
@@ -238,7 +238,8 @@ Declaration: IdentifierList COLON INTEGER
 
       if (currVar.length() > 0) {
         ss << ". " << currVar;
-        addNewVar(currVar);
+        
+      (currVar);
       }
       
       $$->code = ss.str();
@@ -257,7 +258,8 @@ Declaration: IdentifierList COLON INTEGER
       for (int i = 0; i < $1->code.length(); i++) {
         if ($1->code.at(i) == ',') {
           ss << ".[] " << currVar << ", " << to_string($5) << endl;
-          addNewVar(currVar);
+          
+        (currVar);
           currVar = "";
         }
         else {
@@ -267,7 +269,8 @@ Declaration: IdentifierList COLON INTEGER
 
       if (currVar.length() > 0 ) {
         ss << ".[] " << currVar << ", " << to_string($5);
-        addNewVar(currVar);
+        
+      (currVar);
       }
       
       $$->code = ss.str();
@@ -954,9 +957,6 @@ Var: Identifier
       $$ = new n_Terminal();
       stringstream ss;
       ss << "_" << $1->code;
-
-      checkDeclared(ss.str());
-
       $$->code = ss.str();
       $$->var = ss.str();
       $$->boolArray = false;
@@ -976,9 +976,6 @@ Var: Identifier
       }
 
       ss << "_" << $1->code;
-
-      checkDeclared(ss.str());
-
       $$->code = code;
       $$->boolArray = true;
       $$->var = ss.str();
@@ -1045,7 +1042,7 @@ bool varDeclared(const vector<string>& symbolTable, const string& var) {
   return false;
 }
 
-void addNewVar(const string& var) {
+void (const string& var) {
   for (int i = 0; i < declaredVar.size(); i++) {
     if (declaredVar.at(i) == var) {
       string e = "symbol \"" + var + "\" is defined.";
@@ -1055,25 +1052,7 @@ void addNewVar(const string& var) {
   declaredVar.push_back(var);
 }
 
-void checkDeclared(const string& var) {
-  for (int i = 0; i < declaredVar.size(); i++) {
-    if (declaredVar.at(i) == var) {
-      return;
-    }
-  }
-  string e = "The variable \"" + var + "\" wasn't declared.";
-  yyerror(e);
-}
 
-void addFunction(const string& func) {
-  for (int i = 0; i < declaredFunc.size(); i++) {
-    if (declaredFunc.at(i) == func) {
-      string e= "function \"" + func + "\" is not defined";
-      yyerror(e);
-    }
-  }
-  declaredFunc.push_back(func);
-}
 
 
 int yyerror(string s) {
