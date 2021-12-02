@@ -21,7 +21,7 @@
   int yyerror(string s);
   int yyeror(char *s);
   int yylex(void);
-  string makeTemp();
+  string createTemp();
   string createLabel();
   void replaceString(string&, const string&, const string&);
   void addNewVar(const string&);
@@ -358,21 +358,21 @@ Statement: Var ASSIGN Expression
   | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP
     {
       $$ = new n_Terminal();
-      string conditionalLabel = createLabel();
+      string conLabel = createLabel();
       string newLabel = createLabel();
       string endLabel = createLabel();
       stringstream ss;
 
-      string replaceContinue = ":= " + conditionalLabel;
+      string replaceContinue = ":= " + conLabel;
       replaceString($4->code, "continue", replaceContinue);
 
-      ss << ": " << conditionalLabel << endl; 
+      ss << ": " << conLabel << endl; 
       ss << $2->code << endl; 
       ss << "?:= " << newLabel << ", " << $2->r_type << endl; 
       ss << ":= " << endLabel << endl; 
       ss << ": " << newLabel << endl;
       ss << $4->code << endl; 
-      ss << ":= " << conditionalLabel << endl; 
+      ss << ":= " << conLabel << endl; 
       ss << ": " << endLabel;
 
       $$->code = ss.str();
@@ -381,15 +381,15 @@ Statement: Var ASSIGN Expression
     {
       $$ = new n_Terminal();
       string newLabel = createLabel();
-      string conditionalLabel = createLabel();
+      string conLabel = createLabel();
       stringstream ss;
 
-      string replaceContinue = ":= " + conditionalLabel;
+      string replaceContinue = ":= " + conLabel;
       replaceString($3->code, "continue", replaceContinue);
 
       ss << ": " << newLabel << endl; 
       ss << $3->code << endl;
-      ss << ": " << conditionalLabel << endl;
+      ss << ": " << conLabel << endl;
       ss << $6->code << endl;
       ss << "?:= " << newLabel << ", " << $6->r_type;
 
@@ -398,17 +398,17 @@ Statement: Var ASSIGN Expression
   | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP
     {
       $$ = new n_Terminal();
-      string conditionalLabel = createLabel();
+      string conLabel = createLabel();
       string newLabel = createLabel();
       string endLabel = createLabel();
-      string loopVariable = makeTemp();
+      string loopVariable = createTemp();
       stringstream ss;
 
-      string replaceContinue = ":= " + conditionalLabel;
+      string replaceContinue = ":= " + conLabel;
       replaceString($12->code, "continue", replaceContinue);
       
       ss << "= " << loopVariable << ", " << $4 << endl; 
-      ss << ": " << conditionalLabel << endl;
+      ss << ": " << conLabel << endl;
       ss << $6->code << endl; 
       ss << "?:= " << newLabel << ", " << $6->r_type << endl; 
       ss << ":= " << endLabel << endl; 
@@ -416,7 +416,7 @@ Statement: Var ASSIGN Expression
       ss << $12->code << endl;
       ss << $10->code << endl; 
       ss << "= " << loopVariable << ", " << $10->r_type << endl; 
-      ss << ":= " << conditionalLabel << endl; 
+      ss << ":= " << conLabel << endl; 
       ss << ": " << endLabel;
 
       $$->code = ss.str();
@@ -477,7 +477,7 @@ Statement: Var ASSIGN Expression
 
       }
       else {
-        returnOp = makeTemp();
+        returnOp = createTemp();
         ss << ". " << returnOp << endl;
         ss << "= " << returnOp << ", " << $2->code << endl;
       }
@@ -506,7 +506,7 @@ StatementList: Statement SEMICOLON
 BoolExpr: BoolExpr OR RelationAndExpr
     {
       $$ = new n_Terminal();
-      string returnName = makeTemp(); 
+      string returnName = createTemp(); 
       stringstream ss;
 
       ss << $1->code << endl << $3->code << endl; 
@@ -527,7 +527,7 @@ BoolExpr: BoolExpr OR RelationAndExpr
 RelationAndExpr: RelationAndExpr AND RelationExpr
     {
       $$ = new n_Terminal();
-      string returnName = makeTemp(); 
+      string returnName = createTemp(); 
 
       stringstream ss;
       ss << $1->code << endl << $3->code << endl; 
@@ -555,7 +555,7 @@ RelationExpr: Relations
   | NOT Relations
     {
       $$ = new n_Terminal();
-      string notTemp = makeTemp();
+      string notTemp = createTemp();
 
       stringstream ss;
       ss << $2->code << endl;
@@ -567,7 +567,7 @@ RelationExpr: Relations
 Relations: Expression Comp Expression
     {
       $$ = new n_Terminal();
-      string compResult = makeTemp();
+      string compResult = createTemp();
       stringstream ss;
       string firstOp;
 
@@ -596,7 +596,7 @@ Relations: Expression Comp Expression
   | TRUE
     {
       $$ = new n_Terminal();
-      string trueTemp = makeTemp();
+      string trueTemp = createTemp();
       stringstream ss;
 
       ss << ". " << trueTemp << endl;
@@ -607,7 +607,7 @@ Relations: Expression Comp Expression
   | FALSE
     {
       $$ = new n_Terminal();
-      string falseTemp = makeTemp();
+      string falseTemp = createTemp();
       stringstream ss;
 
       ss << ". " << falseTemp << endl;
@@ -636,7 +636,7 @@ Comp: EQ {/* pass value directly as $$ */}
 Expression: Expression ADD MultiplicativeExpr
     {
       $$ = new n_Terminal();
-      string addResult = makeTemp();
+      string addResult = createTemp();
       stringstream ss;
       string firstOp;
 
@@ -666,7 +666,7 @@ Expression: Expression ADD MultiplicativeExpr
   | Expression SUB MultiplicativeExpr
     {
       $$ = new n_Terminal();
-      string subResult = makeTemp();
+      string subResult = createTemp();
       stringstream ss;
       string firstOp;
 
@@ -728,7 +728,7 @@ ExpressionList: ExpressionList COMMA Expression
 MultiplicativeExpr: MultiplicativeExpr MULT Term
     {
       $$ = new n_Terminal();
-      string multResult = makeTemp();
+      string multResult = createTemp();
       stringstream ss;
       string firstOp;
 
@@ -758,7 +758,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
   | MultiplicativeExpr DIV Term
     {
       $$ = new n_Terminal();
-      string divResult = makeTemp();
+      string divResult = createTemp();
       stringstream ss;
       string firstOp;
 
@@ -788,7 +788,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
   | MultiplicativeExpr MOD Term
     {
       $$ = new n_Terminal();
-      string modResult = makeTemp();
+      string modResult = createTemp();
       stringstream ss;
       string firstOp;
 
@@ -829,7 +829,7 @@ Term: TermInner
       $$ = new n_Terminal();
 
       if ($1->r_type == "var") {
-        string newTemp = makeTemp();
+        string newTemp = createTemp();
         stringstream ss;
         
         if ($1->boolArray) {
@@ -859,10 +859,10 @@ Term: TermInner
     {
       $$ = new n_Terminal();
       stringstream ss;
-      string subTemp = makeTemp();
+      string subTemp = createTemp();
 
       if ($2->r_type == "var") {
-        string newTemp = makeTemp();
+        string newTemp = createTemp();
         
         if ($2->boolArray) {
           if ($2->code.length() > 0) {
@@ -895,7 +895,7 @@ Term: TermInner
   | Identifier L_PAREN ExpressionList R_PAREN
     {
       $$ = new n_Terminal();
-      string newTemp = makeTemp();
+      string newTemp = createTemp();
       stringstream ss, sret;
 
       ss << $3->code << endl; 
@@ -1016,7 +1016,7 @@ VarList: Var
   ;
 
 %%
-string makeTemp() {
+string createTemp() {
   static int tempNum = 0;
   return "__temp__" + to_string(tempNum++);
 }
