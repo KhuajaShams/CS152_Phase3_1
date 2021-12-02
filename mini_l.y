@@ -833,9 +833,7 @@ Term: TermInner
         stringstream ss;
         
         if ($1->boolArray) {
-          if ($1->code.length() > 0) {
-            ss << $1->code << endl;
-          }
+          ss << $1->code << endl;
           ss << "=[] " << newTemp << ", " << $1->var << ", " << $1->index;
           $$->var = $1->var;
           $$->index = $1->index;
