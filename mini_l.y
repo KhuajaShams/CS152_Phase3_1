@@ -359,7 +359,7 @@ Statement: Var ASSIGN Expression
     {
       $$ = new n_Terminal();
       string conditionalLabel = createLabel();
-      string startLabel = createLabel();
+      string newLabel = createLabel();
       string endLabel = createLabel();
       stringstream ss;
 
@@ -368,9 +368,9 @@ Statement: Var ASSIGN Expression
 
       ss << ": " << conditionalLabel << endl; 
       ss << $2->code << endl; 
-      ss << "?:= " << startLabel << ", " << $2->r_type << endl; 
+      ss << "?:= " << newLabel << ", " << $2->r_type << endl; 
       ss << ":= " << endLabel << endl; 
-      ss << ": " << startLabel << endl;
+      ss << ": " << newLabel << endl;
       ss << $4->code << endl; 
       ss << ":= " << conditionalLabel << endl; 
       ss << ": " << endLabel;
@@ -380,18 +380,18 @@ Statement: Var ASSIGN Expression
   | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr
     {
       $$ = new n_Terminal();
-      string startLabel = createLabel();
+      string newLabel = createLabel();
       string conditionalLabel = createLabel();
       stringstream ss;
 
       string replaceContinue = ":= " + conditionalLabel;
       replaceString($3->code, "continue", replaceContinue);
 
-      ss << ": " << startLabel << endl; 
+      ss << ": " << newLabel << endl; 
       ss << $3->code << endl;
       ss << ": " << conditionalLabel << endl;
       ss << $6->code << endl;
-      ss << "?:= " << startLabel << ", " << $6->r_type;
+      ss << "?:= " << newLabel << ", " << $6->r_type;
 
       $$->code = ss.str();
     }
@@ -399,7 +399,7 @@ Statement: Var ASSIGN Expression
     {
       $$ = new n_Terminal();
       string conditionalLabel = createLabel();
-      string startLabel = createLabel();
+      string newLabel = createLabel();
       string endLabel = createLabel();
       string loopVariable = makeTemp();
       stringstream ss;
@@ -410,9 +410,9 @@ Statement: Var ASSIGN Expression
       ss << "= " << loopVariable << ", " << $4 << endl; 
       ss << ": " << conditionalLabel << endl;
       ss << $6->code << endl; 
-      ss << "?:= " << startLabel << ", " << $6->r_type << endl; 
+      ss << "?:= " << newLabel << ", " << $6->r_type << endl; 
       ss << ":= " << endLabel << endl; 
-      ss << ": " << startLabel << endl;
+      ss << ": " << newLabel << endl;
       ss << $12->code << endl;
       ss << $10->code << endl; 
       ss << "= " << loopVariable << ", " << $10->r_type << endl; 
