@@ -2,7 +2,7 @@
   #include<string>
   using namespace std;
   
-  struct nonTerm {
+  struct n_Terminal {
     string code;
     string ret_name;
     bool isArray;
@@ -42,7 +42,7 @@
 %union {
   int int_val;
   char* str_val;
-  nonTerm* n_term;
+  n_Terminal* n_term;
 }
 
 %error-verbose
@@ -109,14 +109,14 @@ Program: FunctionList
   ;
 FunctionList: Function FunctionList
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       ss << $1->code << endl << $2->code;
       $$->code = ss.str();
     }
   | Function
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code;
     }
   ;
@@ -124,7 +124,7 @@ FunctionList: Function FunctionList
 /* Function */
 Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
 
       if ($2->code == "main") {
@@ -149,7 +149,7 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       
       ss << $2->code << endl;
@@ -174,16 +174,16 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
     }
   | BEGIN_PARAMS END_PARAMS
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
     }
   ;
 FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $2->code;
     }
   | BEGIN_LOCALS END_LOCALS {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
     }
   ;
 FunctionBody: BEGIN_BODY StatementList END_BODY
@@ -193,17 +193,17 @@ FunctionBody: BEGIN_BODY StatementList END_BODY
         exit(1);
       }
 
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $2->code;
     }
   | BEGIN_BODY END_BODY
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
     }
   ;
 DeclarationList: DeclarationList Declaration SEMICOLON
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss, slist;
 
       ss << $1->code << endl << $2->code;
@@ -215,7 +215,7 @@ DeclarationList: DeclarationList Declaration SEMICOLON
     }
   | Declaration SEMICOLON
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code;
       $$->ret_name = $1->ret_name; 
     }
@@ -224,7 +224,7 @@ DeclarationList: DeclarationList Declaration SEMICOLON
 /* Declaration */
 Declaration: IdentifierList COLON INTEGER
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss, var;
       string currVar = "";
 
@@ -253,7 +253,7 @@ Declaration: IdentifierList COLON INTEGER
       if ($5 <= 0) {
         yyerror("array size < 1");
       }
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       string currVar = "";
 
@@ -279,14 +279,14 @@ Declaration: IdentifierList COLON INTEGER
   ;
 IdentifierList: Identifier
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       ss << "_" << $1->code;
       $$->code = ss.str();
     }
   | Identifier COMMA IdentifierList
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       ss << "_" << $1->code << "," << $3->code;
       $$->code = ss.str();
@@ -294,7 +294,7 @@ IdentifierList: Identifier
   ;
 Identifier: IDENT
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1;
     }
   ;
@@ -302,7 +302,7 @@ Identifier: IDENT
 /* Statement */
 Statement: Var ASSIGN Expression
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       string assign;
 
@@ -329,7 +329,7 @@ Statement: Var ASSIGN Expression
     }
   | IF BoolExpr THEN StatementList ENDIF
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string ifTrue = makeLabel();
       string ifFalse = makeLabel();
       stringstream ss;
@@ -344,7 +344,7 @@ Statement: Var ASSIGN Expression
     }
   | IF BoolExpr THEN StatementList ELSE StatementList ENDIF
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string ifTrue = makeLabel();
       string ifFalse = makeLabel();
       stringstream ss;
@@ -360,7 +360,7 @@ Statement: Var ASSIGN Expression
     }
   | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string conditionalLabel = makeLabel();
       string startLabel = makeLabel();
       string endLabel = makeLabel();
@@ -382,7 +382,7 @@ Statement: Var ASSIGN Expression
     }
   | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string startLabel = makeLabel();
       string conditionalLabel = makeLabel();
       stringstream ss;
@@ -400,7 +400,7 @@ Statement: Var ASSIGN Expression
     }
   | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string conditionalLabel = makeLabel();
       string startLabel = makeLabel();
       string endLabel = makeLabel();
@@ -426,7 +426,7 @@ Statement: Var ASSIGN Expression
     }
   | READ VarList
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       string temp = "";
       for (unsigned i = 0; i < $2->code.length(); ++i) {
@@ -445,7 +445,7 @@ Statement: Var ASSIGN Expression
     }
   | WRITE VarList
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       string temp = "";
       for (unsigned i = 0; i < $2->code.length(); ++i) {
@@ -464,12 +464,12 @@ Statement: Var ASSIGN Expression
     }
   | CONTINUE
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = "continue";
     }
   | RETURN Expression
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
 
       string returnOp;
@@ -493,12 +493,12 @@ Statement: Var ASSIGN Expression
   ;
 StatementList: Statement SEMICOLON
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code;
     }
   | StatementList Statement SEMICOLON
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       ss << $1->code << endl << $2->code;
       $$->code = ss.str();
@@ -508,7 +508,7 @@ StatementList: Statement SEMICOLON
 /* Bool-Expr */
 BoolExpr: BoolExpr OR RelationAndExpr
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string returnName = makeTemp(); 
       stringstream ss;
 
@@ -521,7 +521,7 @@ BoolExpr: BoolExpr OR RelationAndExpr
     }
   | RelationAndExpr
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code; 
       $$->ret_name = $1->ret_name;
     }
@@ -529,7 +529,7 @@ BoolExpr: BoolExpr OR RelationAndExpr
 /* Relation_And_Expr */
 RelationAndExpr: RelationAndExpr AND RelationExpr
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string returnName = makeTemp(); 
 
       stringstream ss;
@@ -542,7 +542,7 @@ RelationAndExpr: RelationAndExpr AND RelationExpr
     }
   | RelationExpr
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code; 
       $$->ret_name = $1->ret_name;
     }
@@ -551,13 +551,13 @@ RelationAndExpr: RelationAndExpr AND RelationExpr
 /* Relation_Expr */
 RelationExpr: Relations
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code;
       $$->ret_name = $1->ret_name;
     }
   | NOT Relations
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string notTemp = makeTemp();
 
       stringstream ss;
@@ -569,7 +569,7 @@ RelationExpr: Relations
   ;
 Relations: Expression Comp Expression
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string compResult = makeTemp();
       stringstream ss;
       string firstOp;
@@ -598,7 +598,7 @@ Relations: Expression Comp Expression
     }
   | TRUE
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string trueTemp = makeTemp();
       stringstream ss;
 
@@ -609,7 +609,7 @@ Relations: Expression Comp Expression
     }
   | FALSE
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string falseTemp = makeTemp();
       stringstream ss;
 
@@ -620,7 +620,7 @@ Relations: Expression Comp Expression
     }
   | L_PAREN BoolExpr R_PAREN
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $2->code;
       $$->ret_name = $2->ret_name;
     }
@@ -638,7 +638,7 @@ Comp: EQ {/* pass value directly as $$ */}
 /* Expression */
 Expression: Expression ADD MultiplicativeExpr
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string addResult = makeTemp();
       stringstream ss;
       string firstOp;
@@ -668,7 +668,7 @@ Expression: Expression ADD MultiplicativeExpr
     }
   | Expression SUB MultiplicativeExpr
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string subResult = makeTemp();
       stringstream ss;
       string firstOp;
@@ -698,14 +698,14 @@ Expression: Expression ADD MultiplicativeExpr
     }
   | MultiplicativeExpr
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code;
       $$->ret_name = $1->ret_name;
     }
   ;
 ExpressionList: ExpressionList COMMA Expression
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream scode, sret;
 
       scode << $1->code << endl << $3->code; 
@@ -717,20 +717,20 @@ ExpressionList: ExpressionList COMMA Expression
     }
   | Expression
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code;
       $$->ret_name = $1->ret_name;
     }
   | %empty
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
     }
   ;
 
 /* Multiplicative_Expr */
 MultiplicativeExpr: MultiplicativeExpr MULT Term
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string multResult = makeTemp();
       stringstream ss;
       string firstOp;
@@ -760,7 +760,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
     }
   | MultiplicativeExpr DIV Term
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string divResult = makeTemp();
       stringstream ss;
       string firstOp;
@@ -790,7 +790,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
     }
   | MultiplicativeExpr MOD Term
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string modResult = makeTemp();
       stringstream ss;
       string firstOp;
@@ -820,7 +820,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
     }
   | Term
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code;
       $$->ret_name = $1->ret_name;
     }
@@ -829,7 +829,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
 /* Term */
 Term: TermInner
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
 
       if ($1->ret_name == "var") {
         string newTemp = makeTemp();
@@ -862,7 +862,7 @@ Term: TermInner
     }
   | SUB TermInner
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       string subTemp = makeTemp();
 
@@ -899,7 +899,7 @@ Term: TermInner
     }
   | Identifier L_PAREN ExpressionList R_PAREN
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       string newTemp = makeTemp();
       stringstream ss, sret;
 
@@ -928,7 +928,7 @@ Term: TermInner
   ;
 TermInner: Var
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = $1->code;
       $$->ret_name = "var";
       $$->isArray = $1->isArray;
@@ -937,13 +937,13 @@ TermInner: Var
     }
   | NUMBER
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       $$->code = to_string($1);
       $$->ret_name = "num";
     }
   | L_PAREN Expression R_PAREN
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
 
       ss << $2->code; 
@@ -961,7 +961,7 @@ Var: Identifier
         (i.e., trying to use an array variable as a regular integer variable).
       */
 
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       ss << "_" << $1->code;
 
@@ -979,7 +979,7 @@ Var: Identifier
         (i.e., trying to use a regular integer variable as an array variable).
       */
       
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       string index, code = "";
 
@@ -1003,14 +1003,14 @@ Var: Identifier
   ;
 VarList: Var
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       $$->code = $1->var;
       $$->isArray = $1->isArray;
     }
   | Var COMMA VarList
     {
-      $$ = new nonTerm();
+      $$ = new n_Terminal();
       stringstream ss;
       ss << $1->var << "," << $3->code;
       $$->code = ss.str();
