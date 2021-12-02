@@ -327,30 +327,30 @@ Statement: Var ASSIGN Expression
   | IF BoolExpr THEN StatementList ENDIF
     {
       $$ = new n_Terminal();
-      string ifTrue = createLabel();
-      string ifFalse = createLabel();
+      string trueLabel = createLabel();
+      string falseLabel = createLabel();
       stringstream ss;
       ss << $2->code << endl; 
-      ss << "?:= " << ifTrue << ", " << $2->r_type << endl; 
-      ss << ":= " << ifFalse << endl;
-      ss << ": " << ifTrue << endl; 
+      ss << "?:= " << trueLabel << ", " << $2->r_type << endl; 
+      ss << ":= " << falseLabel << endl;
+      ss << ": " << trueLabel << endl; 
       ss << $4->code << endl; 
-      ss << ": " << ifFalse; 
+      ss << ": " << falseLabel; 
 
       $$->code = ss.str();
     }
   | IF BoolExpr THEN StatementList ELSE StatementList ENDIF
     {
       $$ = new n_Terminal();
-      string ifTrue = createLabel();
-      string ifFalse = createLabel();
+      string trueLabel = createLabel();
+      string falseLabel = createLabel();
       stringstream ss;
       ss << $2->code << endl; 
-      ss << "?:= " << ifTrue << ", " << $2->r_type << endl; 
-      ss << ":= " << ifFalse << endl; 
-      ss << ": " << ifTrue << endl; 
+      ss << "?:= " << trueLabel << ", " << $2->r_type << endl; 
+      ss << ":= " << falseLabel << endl; 
+      ss << ": " << trueLabel << endl; 
       ss << $4->code << endl; 
-      ss << ": " << ifFalse << endl; 
+      ss << ": " << falseLabel << endl; 
       ss << $6->code; 
 
       $$->code = ss.str();
