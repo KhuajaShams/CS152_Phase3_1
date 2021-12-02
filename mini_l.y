@@ -188,7 +188,7 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
 FunctionBody: BEGIN_BODY StatementList END_BODY
     {
 
-      if ($2->code.find("continue") == string::npos) {
+      if ($2->code.find("continue") != string::npos) {
         cout << "Error: continue statement not within a loop." << endl;
         exit(1);
       }
