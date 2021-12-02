@@ -2,6 +2,13 @@
   #include<string>
   using namespace std;
   
+  struct nonTerm {
+    string code;
+    string ret_name;
+    bool isArray;
+    string var;
+    string index;
+  };
 }
 
 %{
@@ -35,13 +42,7 @@
 %union {
   int int_val;
   char* str_val;
-    struct nonTerm {
-    string code;
-    string ret_name;
-    bool isArray;
-    string var;
-    string index;
-  } non_terminal;
+  nonTerm* n_term;
 }
 
 %error-verbose
@@ -68,29 +69,29 @@
 %token<int_val> NUMBER;
 %type<str_val> Comp
 
-%type<non_terminal> Program
-%type<non_terminal> DeclarationList
-%type<non_terminal> Declaration
-%type<non_terminal> FunctionList
-%type<non_terminal> Function
-%type<non_terminal> Identifier
-%type<non_terminal> FunctionParams
-%type<non_terminal> FunctionLocals
-%type<non_terminal> FunctionBody
-%type<non_terminal> StatementList
-%type<non_terminal> Statement
-%type<non_terminal> IdentifierList
-%type<non_terminal> Var
-%type<non_terminal> VarList
-%type<non_terminal> Expression
-%type<non_terminal> ExpressionList
-%type<non_terminal> BoolExpr
-%type<non_terminal> RelationAndExpr
-%type<non_terminal> RelationExpr
-%type<non_terminal> Relations
-%type<non_terminal> MultiplicativeExpr
-%type<non_terminal> Term
-%type<non_terminal> TermInner
+%type<n_term> Program
+%type<n_term> DeclarationList
+%type<n_term> Declaration
+%type<n_term> FunctionList
+%type<n_term> Function
+%type<n_term> Identifier
+%type<n_term> FunctionParams
+%type<n_term> FunctionLocals
+%type<n_term> FunctionBody
+%type<n_term> StatementList
+%type<n_term> Statement
+%type<n_term> IdentifierList
+%type<n_term> Var
+%type<n_term> VarList
+%type<n_term> Expression
+%type<n_term> ExpressionList
+%type<n_term> BoolExpr
+%type<n_term> RelationAndExpr
+%type<n_term> RelationExpr
+%type<n_term> Relations
+%type<n_term> MultiplicativeExpr
+%type<n_term> Term
+%type<n_term> TermInner
 
 %%
 /* Program */
