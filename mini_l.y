@@ -12,20 +12,20 @@
 }
 
 %{
+  using namespace std;
   #include "stdio.h"
   #include <string>
   #include <vector>
   #include <iostream>
   #include <sstream>
-  using namespace std;
-  int yyeror(char *s);
   int yyerror(string s);
+  int yyeror(char *s);
   int yylex(void);
   string makeTemp();
   string createLabel();
   void replaceString(string&, const string&, const string&);
-  bool varDeclared(const vector<string>&, const string&);
   void addNewVar(const string&);
+  bool varDeclared(const vector<string>&, const string&);
   void checkDeclared(const string&);
   void addFunction(const string&);
   bool isMain = false;
