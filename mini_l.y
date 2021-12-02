@@ -31,7 +31,6 @@
   void addLocalVar(const string&);
   void checkDeclared(const string&);
   void addFunction(const string&);
-  void checkFuncDeclared(const string&);
   bool isMain = false;
   extern FILE* yyin;
 
@@ -1105,15 +1104,6 @@ void addFunction(const string& func) {
   declaredFunc.push_back(func);
 }
 
-void checkFuncDeclared(const string& func) {
-  for (int i = 0; i < declaredFunc.size(); i++) {
-    if (declaredFunc.at(i) == func) {
-      return;
-    }
-  }
-  string err = "called function \"" + func + "\" was not previously declared.";
-  yyerror(err);
-}
 
 int yyerror(string s) {
   extern int currLine, currPos;
