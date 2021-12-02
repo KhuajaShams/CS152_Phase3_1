@@ -33,7 +33,7 @@
   void checkDeclared(const string&);
   void addFunction(const string&);
   void checkFuncDeclared(const string&);
-  bool mainCheck = false;
+  bool isMain = false;
   extern FILE* yyin;
 
   vector<string> funcNames;
@@ -97,7 +97,7 @@
 /* Program */
 Program: FunctionList
     {
-      if (!mainCheck) {
+      if (!isMain) {
         yyerror("\"main\" function not definied in program.");
       }
       string s = $1->code;
@@ -110,9 +110,9 @@ Program: FunctionList
 FunctionList: Function FunctionList
     {
       $$ = new nonTerm();
-      string s;
-      s = $1->code + "\n" + $2->code;
-      $$->code = s;
+      stringstream ss;
+      ss << $1->code << endl << $2->code;
+      $$->code = ss.str();
     }
   | Function
     {
@@ -128,7 +128,7 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
       stringstream ss;
 
       if ($2->code == "main") {
-        mainCheck = true;
+        isMain = true;
       }
 
       addFunction($2->code);
