@@ -87,7 +87,7 @@
 Program: FunctionList
     {
       if (!isMain) {
-        yyerror("\"main\" function not definied in program.");
+        yyerror("\"main\" function doesn't exist.");
       }
       string s = $1->code;
       cout << s << endl;
@@ -178,7 +178,7 @@ FunctionBody: BEGIN_BODY StatementList END_BODY
     {
 
       if ($2->code.find("continue") != string::npos) {
-        cout << "Error: continue statement not within a loop." << endl;
+        cout << "continue isn't in loop" << endl;
         exit(1);
       }
 
@@ -242,7 +242,7 @@ Declaration: IdentifierList COLON INTEGER
     {
       string buffer;
       if ($5 <= 0) {
-        yyerror("array size < 1");
+        yyerror("array is not of size");
       }
       $$ = new n_Terminal();
       stringstream ss;
