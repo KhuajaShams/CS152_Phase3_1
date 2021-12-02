@@ -155,7 +155,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
       ss << $2->code << endl;
       string ident;
       int paramNum = 0;
-      for (unsigned i = 0; i < $2->ret_name.length(); ++i) {
+      for (int i = 0; i < $2->ret_name.length(); i++) {
         if ($2->ret_name[i] == ',') {
           ss << "= " << ident << ", $" << to_string(paramNum) << endl;
           ident = "";
@@ -228,7 +228,7 @@ Declaration: IdentifierList COLON INTEGER
       stringstream ss, var;
       string currVar = "";
 
-      for (unsigned i = 0; i < $1->code.length(); ++i) {
+      for (int i = 0; i < $1->code.length(); i++) {
         if ($1->code.at(i) == ',') {
           ss << ". " << currVar << endl;
           addLocalVar(currVar);
@@ -257,7 +257,7 @@ Declaration: IdentifierList COLON INTEGER
       stringstream ss;
       string currVar = "";
 
-      for (unsigned i = 0; i < $1->code.length(); ++i) {
+      for (int i = 0; i < $1->code.length(); i++) {
         if ($1->code.at(i) == ',') {
           ss << ".[] " << currVar << ", " << to_string($5) << endl;
           addLocalVar(currVar);
@@ -429,7 +429,7 @@ Statement: Var ASSIGN Expression
       $$ = new n_Terminal();
       stringstream ss;
       string temp = "";
-      for (unsigned i = 0; i < $2->code.length(); ++i) {
+      for (int i = 0; i < $2->code.length(); i++) {
         if ($2->code[i] == ',') {
           ss << ".< " << temp << endl;
           temp = "";
@@ -448,7 +448,7 @@ Statement: Var ASSIGN Expression
       $$ = new n_Terminal();
       stringstream ss;
       string temp = "";
-      for (unsigned i = 0; i < $2->code.length(); ++i) {
+      for (int i = 0; i < $2->code.length(); i++) {
         if ($2->code[i] == ',') {
           ss << ".< " << temp << endl;
           temp = "";
@@ -905,7 +905,7 @@ Term: TermInner
 
       ss << $3->code << endl; 
       string temp;
-      for (unsigned i = 0; i < $3->ret_name.length(); ++i) {
+      for (int i = 0; i < $3->ret_name.length(); i++) {
         if ($3->ret_name[i] == ',') {
           sret << "param " << temp << endl;
           temp = "";
@@ -1048,7 +1048,7 @@ string createVar(char* ident) {
 }
 
 string findIndex (const string &ref) {
-  unsigned leftB = ref.find('[');
+  int leftB = ref.find('[');
   if (leftB != string::npos) {
     int indexLength = ((ref.length() - 1) - leftB) - 1;
     return ref.substr(leftB + 1, indexLength);
@@ -1074,7 +1074,7 @@ void replaceString(string& str, const string& oldStr, const string& newStr) {
 }
 
 bool varDeclared(const vector<string>& symbolTable, const string& var) {
-  for (unsigned i = 0; i < symbolTable.size(); ++i) {
+  for (int i = 0; i < symbolTable.size(); i++) {
     if (symbolTable.at(i) == var) {
       return true;
     }
@@ -1083,7 +1083,7 @@ bool varDeclared(const vector<string>& symbolTable, const string& var) {
 }
 
 void addLocalVar(const string& var) {
-  for (unsigned i = 0; i < varNames.size(); ++i) {
+  for (int i = 0; i < varNames.size(); i++) {
     if (varNames.at(i) == var) {
       string errorString = "symbol \"" + var + "\" is multiply-defined.";
       yyerror(errorString);
@@ -1093,7 +1093,7 @@ void addLocalVar(const string& var) {
 }
 
 void checkDeclared(const string& var) {
-  for (unsigned i = 0; i < varNames.size(); ++i) {
+  for (int i = 0; i < varNames.size(); i++) {
     if (varNames.at(i) == var) {
       return;
     }
@@ -1103,7 +1103,7 @@ void checkDeclared(const string& var) {
 }
 
 void addFunction(const string& func) {
-  for (unsigned i = 0; i < funcNames.size(); ++i) {
+  for (int i = 0; i < funcNames.size(); i++) {
     if (funcNames.at(i) == func) {
       string errorString = "function \"" + func + "\" is multiply-defined.";
       yyerror(errorString);
@@ -1113,18 +1113,20 @@ void addFunction(const string& func) {
 }
 
 void checkFuncDeclared(const string& func) {
-  for (unsigned i = 0; i < funcNames.size(); ++i) {
+  for (int i = 0; i < funcNames.size(); i++) {
     if (funcNames.at(i) == func) {
       return;
     }
   }
-  string err = "function \"" + func + "\" wasn't declared.";
+  string err = "called function \"" + func + "\" was not previously declared.";
   yyerror(err);
 }
 
 int yyerror(string s) {
   extern int currLine, currPos;
-  cout << "Error on line " << currLine << "position " << currPos << " " <<s;
+  extern char *yytext;
+
+  cout << "Error line: " << currLine << ": " << s << endl;
   exit(1);
 }
 
