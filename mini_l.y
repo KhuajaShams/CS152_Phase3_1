@@ -141,7 +141,7 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
       
       if ($5->code.length() > 0) {ss << $5->code << endl;}
       
-      if ($6->code.length() > 0) {ss << $6->code endl;}
+      if ($6->code.length() > 0) {ss << $6->code << endl;}
       
       ss << "endfunc";
       $$->code = ss.str();
