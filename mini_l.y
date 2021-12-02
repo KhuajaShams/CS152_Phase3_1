@@ -23,12 +23,10 @@
   int yyerror(string s);
   int yylex(void);
   string makeTemp();
-  string makeLabel();
-  string createVar(char*);
-  string findIndex (const string&);
+  string createLabel();
   void replaceString(string&, const string&, const string&);
   bool varDeclared(const vector<string>&, const string&);
-  void addLocalVar(const string&);
+  void addNewVar(const string&);
   void checkDeclared(const string&);
   void addFunction(const string&);
   bool isMain = false;
@@ -230,7 +228,7 @@ Declaration: IdentifierList COLON INTEGER
       for (int i = 0; i < $1->code.length(); i++) {
         if ($1->code.at(i) == ',') {
           ss << ". " << currVar << endl;
-          addLocalVar(currVar);
+          addNewVar(currVar);
           currVar = "";
         }
         else {
@@ -240,7 +238,7 @@ Declaration: IdentifierList COLON INTEGER
 
       if (currVar.length() > 0) {
         ss << ". " << currVar;
-        addLocalVar(currVar);
+        addNewVar(currVar);
       }
       
       $$->code = ss.str();
@@ -259,7 +257,7 @@ Declaration: IdentifierList COLON INTEGER
       for (int i = 0; i < $1->code.length(); i++) {
         if ($1->code.at(i) == ',') {
           ss << ".[] " << currVar << ", " << to_string($5) << endl;
-          addLocalVar(currVar);
+          addNewVar(currVar);
           currVar = "";
         }
         else {
@@ -269,7 +267,7 @@ Declaration: IdentifierList COLON INTEGER
 
       if (currVar.length() > 0 ) {
         ss << ".[] " << currVar << ", " << to_string($5);
-        addLocalVar(currVar);
+        addNewVar(currVar);
       }
       
       $$->code = ss.str();
@@ -329,8 +327,8 @@ Statement: Var ASSIGN Expression
   | IF BoolExpr THEN StatementList ENDIF
     {
       $$ = new n_Terminal();
-      string ifTrue = makeLabel();
-      string ifFalse = makeLabel();
+      string ifTrue = createLabel();
+      string ifFalse = createLabel();
       stringstream ss;
       ss << $2->code << endl; 
       ss << "?:= " << ifTrue << ", " << $2->r_type << endl; 
@@ -344,8 +342,8 @@ Statement: Var ASSIGN Expression
   | IF BoolExpr THEN StatementList ELSE StatementList ENDIF
     {
       $$ = new n_Terminal();
-      string ifTrue = makeLabel();
-      string ifFalse = makeLabel();
+      string ifTrue = createLabel();
+      string ifFalse = createLabel();
       stringstream ss;
       ss << $2->code << endl; 
       ss << "?:= " << ifTrue << ", " << $2->r_type << endl; 
@@ -360,9 +358,9 @@ Statement: Var ASSIGN Expression
   | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP
     {
       $$ = new n_Terminal();
-      string conditionalLabel = makeLabel();
-      string startLabel = makeLabel();
-      string endLabel = makeLabel();
+      string conditionalLabel = createLabel();
+      string startLabel = createLabel();
+      string endLabel = createLabel();
       stringstream ss;
 
       string replaceContinue = ":= " + conditionalLabel;
@@ -382,8 +380,8 @@ Statement: Var ASSIGN Expression
   | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr
     {
       $$ = new n_Terminal();
-      string startLabel = makeLabel();
-      string conditionalLabel = makeLabel();
+      string startLabel = createLabel();
+      string conditionalLabel = createLabel();
       stringstream ss;
 
       string replaceContinue = ":= " + conditionalLabel;
@@ -400,9 +398,9 @@ Statement: Var ASSIGN Expression
   | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP
     {
       $$ = new n_Terminal();
-      string conditionalLabel = makeLabel();
-      string startLabel = makeLabel();
-      string endLabel = makeLabel();
+      string conditionalLabel = createLabel();
+      string startLabel = createLabel();
+      string endLabel = createLabel();
       string loopVariable = makeTemp();
       stringstream ss;
 
@@ -1036,26 +1034,12 @@ string makeTemp() {
   return "__temp__" + to_string(tempNum++);
 }
 
-string makeLabel() {
+string createLabel() {
   static int labelNum = 0;
   return "__label__" + to_string(labelNum++);
 }
 
-string createVar(char* ident) {
-  string newVar = string(ident);
-  return newVar;
-}
 
-string findIndex (const string &ref) {
-  int leftB = ref.find('[');
-  if (leftB != string::npos) {
-    int indexLength = ((ref.length() - 1) - leftB) - 1;
-    return ref.substr(leftB + 1, indexLength);
-  }
-  else {
-    exit(1);
-  }
-}
 
 void replaceString(string& str, const string& oldStr, const string& newStr) {
   string::size_type pos = 0u;
@@ -1074,7 +1058,7 @@ bool varDeclared(const vector<string>& symbolTable, const string& var) {
   return false;
 }
 
-void addLocalVar(const string& var) {
+void addNewVar(const string& var) {
   for (int i = 0; i < declaredVar.size(); i++) {
     if (declaredVar.at(i) == var) {
       string e = "symbol \"" + var + "\" is defined.";
