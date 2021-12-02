@@ -111,7 +111,7 @@ FunctionList: Function FunctionList
     {
       $$ = new nonTerm();
       string s;
-      s = $1->code + endl + $2->code;
+      s = $1->code + "\n" + $2->code;
       $$->code = s;
     }
   | Function
