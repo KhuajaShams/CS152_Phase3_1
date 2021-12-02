@@ -15,11 +15,10 @@
   using namespace std;
   #include "stdio.h"
   #include <string>
-  #include <vector>
   #include <iostream>
   #include <sstream>
-  int yyerror(string s);
   int yyeror(char *s);
+  int yyerror(string s);
   int yylex(void);
   string createTemp();
   string createLabel();
@@ -29,9 +28,9 @@
 
 %}
 %union {
+  n_Terminal* n_term;
   int int_val;
   char* str_val;
-  n_Terminal* n_term;
 }
 
 %error-verbose
