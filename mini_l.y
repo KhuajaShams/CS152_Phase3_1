@@ -4,7 +4,7 @@
   
   struct n_Terminal {
     string code;
-    string ret_name;
+    string r_type;
     bool isArray;
     string var;
     string index;
@@ -154,14 +154,14 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
       ss << $2->code << endl;
       string ident;
       int paramNum = 0;
-      for (int i = 0; i < $2->ret_name.length(); i++) {
-        if ($2->ret_name[i] == ',') {
+      for (int i = 0; i < $2->r_type.length(); i++) {
+        if ($2->r_type[i] == ',') {
           ss << "= " << ident << ", $" << to_string(paramNum) << endl;
           ident = "";
           paramNum++;
           continue;
         }
-        ident.push_back($2->ret_name[i]);
+        ident.push_back($2->r_type[i]);
       }
 
       if (ident.length() > 0) {
@@ -208,16 +208,16 @@ DeclarationList: DeclarationList Declaration SEMICOLON
 
       ss << $1->code << endl << $2->code;
       
-      slist << $1->ret_name << "," << $2->ret_name;
+      slist << $1->r_type << "," << $2->r_type;
 
       $$->code = ss.str();
-      $$->ret_name = slist.str();
+      $$->r_type = slist.str();
     }
   | Declaration SEMICOLON
     {
       $$ = new n_Terminal();
       $$->code = $1->code;
-      $$->ret_name = $1->ret_name; 
+      $$->r_type = $1->r_type; 
     }
   ;
 
@@ -245,7 +245,7 @@ Declaration: IdentifierList COLON INTEGER
       }
       
       $$->code = ss.str();
-      $$->ret_name = $1->code; 
+      $$->r_type = $1->code; 
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
@@ -274,7 +274,7 @@ Declaration: IdentifierList COLON INTEGER
       }
       
       $$->code = ss.str();
-      $$->ret_name = $1->code;
+      $$->r_type = $1->code;
     }
   ;
 IdentifierList: Identifier
@@ -306,9 +306,9 @@ Statement: Var ASSIGN Expression
       stringstream ss;
       string assign;
 
-      if ($3->ret_name != "") {
+      if ($3->r_type != "") {
         ss << $3->code << endl;
-        assign = $3->ret_name;
+        assign = $3->r_type;
       }
       else {
         assign = $3->code;
@@ -325,7 +325,7 @@ Statement: Var ASSIGN Expression
       }
 
       $$->code = ss.str();
-      $$->ret_name = $1->code;
+      $$->r_type = $1->code;
     }
   | IF BoolExpr THEN StatementList ENDIF
     {
@@ -334,7 +334,7 @@ Statement: Var ASSIGN Expression
       string ifFalse = makeLabel();
       stringstream ss;
       ss << $2->code << endl; 
-      ss << "?:= " << ifTrue << ", " << $2->ret_name << endl; 
+      ss << "?:= " << ifTrue << ", " << $2->r_type << endl; 
       ss << ":= " << ifFalse << endl;
       ss << ": " << ifTrue << endl; 
       ss << $4->code << endl; 
@@ -349,7 +349,7 @@ Statement: Var ASSIGN Expression
       string ifFalse = makeLabel();
       stringstream ss;
       ss << $2->code << endl; 
-      ss << "?:= " << ifTrue << ", " << $2->ret_name << endl; 
+      ss << "?:= " << ifTrue << ", " << $2->r_type << endl; 
       ss << ":= " << ifFalse << endl; 
       ss << ": " << ifTrue << endl; 
       ss << $4->code << endl; 
@@ -371,7 +371,7 @@ Statement: Var ASSIGN Expression
 
       ss << ": " << conditionalLabel << endl; 
       ss << $2->code << endl; 
-      ss << "?:= " << startLabel << ", " << $2->ret_name << endl; 
+      ss << "?:= " << startLabel << ", " << $2->r_type << endl; 
       ss << ":= " << endLabel << endl; 
       ss << ": " << startLabel << endl;
       ss << $4->code << endl; 
@@ -394,7 +394,7 @@ Statement: Var ASSIGN Expression
       ss << $3->code << endl;
       ss << ": " << conditionalLabel << endl;
       ss << $6->code << endl;
-      ss << "?:= " << startLabel << ", " << $6->ret_name;
+      ss << "?:= " << startLabel << ", " << $6->r_type;
 
       $$->code = ss.str();
     }
@@ -413,12 +413,12 @@ Statement: Var ASSIGN Expression
       ss << "= " << loopVariable << ", " << $4 << endl; 
       ss << ": " << conditionalLabel << endl;
       ss << $6->code << endl; 
-      ss << "?:= " << startLabel << ", " << $6->ret_name << endl; 
+      ss << "?:= " << startLabel << ", " << $6->r_type << endl; 
       ss << ":= " << endLabel << endl; 
       ss << ": " << startLabel << endl;
       ss << $12->code << endl;
       ss << $10->code << endl; 
-      ss << "= " << loopVariable << ", " << $10->ret_name << endl; 
+      ss << "= " << loopVariable << ", " << $10->r_type << endl; 
       ss << ":= " << conditionalLabel << endl; 
       ss << ": " << endLabel;
 
@@ -474,9 +474,9 @@ Statement: Var ASSIGN Expression
 
       string returnOp;
 
-      if ($2->ret_name != "") {
+      if ($2->r_type != "") {
         ss << $2->code << endl;
-        returnOp = $2->ret_name;
+        returnOp = $2->r_type;
 
       }
       else {
@@ -488,7 +488,7 @@ Statement: Var ASSIGN Expression
       ss << "ret " << returnOp;
       
       $$->code = ss.str();
-      $$->ret_name = returnOp;
+      $$->r_type = returnOp;
     }
   ;
 StatementList: Statement SEMICOLON
@@ -514,16 +514,16 @@ BoolExpr: BoolExpr OR RelationAndExpr
 
       ss << $1->code << endl << $3->code << endl; 
       ss << ". " << returnName << endl; 
-      ss << "|| " << returnName << ", " << $1->ret_name << ", " << $3->ret_name; 
+      ss << "|| " << returnName << ", " << $1->r_type << ", " << $3->r_type; 
       
       $$->code = ss.str();
-      $$->ret_name = returnName;
+      $$->r_type = returnName;
     }
   | RelationAndExpr
     {
       $$ = new n_Terminal();
       $$->code = $1->code; 
-      $$->ret_name = $1->ret_name;
+      $$->r_type = $1->r_type;
     }
   ;
 /* Relation_And_Expr */
@@ -535,16 +535,16 @@ RelationAndExpr: RelationAndExpr AND RelationExpr
       stringstream ss;
       ss << $1->code << endl << $3->code << endl; 
       ss << ". " << returnName << endl; 
-      ss << "&& " << returnName << ", " << $1->ret_name << ", " << $3->ret_name;
+      ss << "&& " << returnName << ", " << $1->r_type << ", " << $3->r_type;
       
       $$->code = ss.str();
-      $$->ret_name = returnName;
+      $$->r_type = returnName;
     }
   | RelationExpr
     {
       $$ = new n_Terminal();
       $$->code = $1->code; 
-      $$->ret_name = $1->ret_name;
+      $$->r_type = $1->r_type;
     }
   ;
 
@@ -553,7 +553,7 @@ RelationExpr: Relations
     {
       $$ = new n_Terminal();
       $$->code = $1->code;
-      $$->ret_name = $1->ret_name;
+      $$->r_type = $1->r_type;
     }
   | NOT Relations
     {
@@ -562,9 +562,9 @@ RelationExpr: Relations
 
       stringstream ss;
       ss << $2->code << endl;
-      ss << "! " << notTemp << ", " << $2->ret_name;
+      ss << "! " << notTemp << ", " << $2->r_type;
       $$->code = ss.str();
-      $$->ret_name = notTemp;
+      $$->r_type = notTemp;
     }
   ;
 Relations: Expression Comp Expression
@@ -574,19 +574,19 @@ Relations: Expression Comp Expression
       stringstream ss;
       string firstOp;
 
-      if ($1->ret_name != "") {
+      if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->ret_name;
+        firstOp = $1->r_type;
 
       }
       else {
         firstOp = $1->code; 
       }
 
-      if ($3->ret_name != "") {
+      if ($3->r_type != "") {
         ss << $3->code << endl;
         ss << ". " << compResult << endl;
-        ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->ret_name;  
+        ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
         ss << ". " << compResult << endl;
@@ -594,7 +594,7 @@ Relations: Expression Comp Expression
       }
 
       $$->code = ss.str();
-      $$->ret_name = compResult;
+      $$->r_type = compResult;
     }
   | TRUE
     {
@@ -605,7 +605,7 @@ Relations: Expression Comp Expression
       ss << ". " << trueTemp << endl;
       ss << "= " << trueTemp << ", 1";
       $$->code = ss.str();
-      $$->ret_name = trueTemp;
+      $$->r_type = trueTemp;
     }
   | FALSE
     {
@@ -616,13 +616,13 @@ Relations: Expression Comp Expression
       ss << ". " << falseTemp << endl;
       ss << "= " << falseTemp << ", 0";
       $$->code = ss.str();
-      $$->ret_name = falseTemp;
+      $$->r_type = falseTemp;
     }
   | L_PAREN BoolExpr R_PAREN
     {
       $$ = new n_Terminal();
       $$->code = $2->code;
-      $$->ret_name = $2->ret_name;
+      $$->r_type = $2->r_type;
     }
   ;
 
@@ -643,9 +643,9 @@ Expression: Expression ADD MultiplicativeExpr
       stringstream ss;
       string firstOp;
 
-      if ($1->ret_name != "") {
+      if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->ret_name;
+        firstOp = $1->r_type;
 
       }
       else {
@@ -653,10 +653,10 @@ Expression: Expression ADD MultiplicativeExpr
       }
 
 
-      if ($3->ret_name != "") {
+      if ($3->r_type != "") {
         ss << $3->code << endl;
         ss << ". " << addResult << endl;
-        ss << "+ " << addResult << ", " << firstOp << ", " << $3->ret_name;  
+        ss << "+ " << addResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
         ss << ". " << addResult << endl;
@@ -664,7 +664,7 @@ Expression: Expression ADD MultiplicativeExpr
       }
 
       $$->code = ss.str();
-      $$->ret_name = addResult;
+      $$->r_type = addResult;
     }
   | Expression SUB MultiplicativeExpr
     {
@@ -673,9 +673,9 @@ Expression: Expression ADD MultiplicativeExpr
       stringstream ss;
       string firstOp;
 
-      if ($1->ret_name != "") {
+      if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->ret_name;
+        firstOp = $1->r_type;
 
       }
       else {
@@ -683,10 +683,10 @@ Expression: Expression ADD MultiplicativeExpr
       }
 
 
-      if ($3->ret_name != "") {
+      if ($3->r_type != "") {
         ss << $3->code << endl;
         ss << ". " << subResult << endl;
-        ss << "- " << subResult << ", " << firstOp << ", " << $3->ret_name;  
+        ss << "- " << subResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
         ss << ". " << subResult << endl;
@@ -694,13 +694,13 @@ Expression: Expression ADD MultiplicativeExpr
       }
 
       $$->code = ss.str();
-      $$->ret_name = subResult;
+      $$->r_type = subResult;
     }
   | MultiplicativeExpr
     {
       $$ = new n_Terminal();
       $$->code = $1->code;
-      $$->ret_name = $1->ret_name;
+      $$->r_type = $1->r_type;
     }
   ;
 ExpressionList: ExpressionList COMMA Expression
@@ -710,16 +710,16 @@ ExpressionList: ExpressionList COMMA Expression
 
       scode << $1->code << endl << $3->code; 
       
-      sret << $3->ret_name << "," << $3->ret_name; 
+      sret << $3->r_type << "," << $3->r_type; 
       
       $$->code = scode.str();
-      $$->ret_name = sret.str();
+      $$->r_type = sret.str();
     }
   | Expression
     {
       $$ = new n_Terminal();
       $$->code = $1->code;
-      $$->ret_name = $1->ret_name;
+      $$->r_type = $1->r_type;
     }
   | %empty
     {
@@ -735,9 +735,9 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       stringstream ss;
       string firstOp;
 
-      if ($1->ret_name != "") {
+      if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->ret_name;
+        firstOp = $1->r_type;
 
       }
       else {
@@ -745,10 +745,10 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       }
 
 
-      if ($3->ret_name != "") {
+      if ($3->r_type != "") {
         ss << $3->code << endl;
         ss << ". " << multResult << endl;
-        ss << "* " << multResult << ", " << firstOp << ", " << $3->ret_name;  
+        ss << "* " << multResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
         ss << ". " << multResult << endl;
@@ -756,7 +756,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       }
 
       $$->code = ss.str();
-      $$->ret_name = multResult;
+      $$->r_type = multResult;
     }
   | MultiplicativeExpr DIV Term
     {
@@ -765,9 +765,9 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       stringstream ss;
       string firstOp;
 
-      if ($1->ret_name != "") {
+      if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->ret_name;
+        firstOp = $1->r_type;
 
       }
       else {
@@ -775,10 +775,10 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       }
 
 
-      if ($3->ret_name != "") {
+      if ($3->r_type != "") {
         ss << $3->code << endl;
         ss << ". " << divResult << endl;
-        ss << "/ " << divResult << ", " << firstOp << ", " << $3->ret_name;  
+        ss << "/ " << divResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
         ss << ". " << divResult << endl;
@@ -786,7 +786,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       }
 
       $$->code = ss.str();
-      $$->ret_name = divResult;
+      $$->r_type = divResult;
     }
   | MultiplicativeExpr MOD Term
     {
@@ -795,9 +795,9 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       stringstream ss;
       string firstOp;
 
-      if ($1->ret_name != "") {
+      if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->ret_name;
+        firstOp = $1->r_type;
 
       }
       else {
@@ -805,10 +805,10 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       }
 
 
-      if ($3->ret_name != "") {
+      if ($3->r_type != "") {
         ss << $3->code << endl;
         ss << ". " << modResult << endl;
-        ss << "% " << modResult << ", " << firstOp << ", " << $3->ret_name;  
+        ss << "% " << modResult << ", " << firstOp << ", " << $3->r_type;  
       }
       else {
         ss << ". " << modResult << endl;
@@ -816,13 +816,13 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       }
 
       $$->code = ss.str();
-      $$->ret_name = modResult;
+      $$->r_type = modResult;
     }
   | Term
     {
       $$ = new n_Terminal();
       $$->code = $1->code;
-      $$->ret_name = $1->ret_name;
+      $$->r_type = $1->r_type;
     }
   ;
 
@@ -831,7 +831,7 @@ Term: TermInner
     {
       $$ = new n_Terminal();
 
-      if ($1->ret_name == "var") {
+      if ($1->r_type == "var") {
         string newTemp = makeTemp();
         stringstream ss;
         
@@ -849,15 +849,15 @@ Term: TermInner
         }
 
         $$->code = ss.str();
-        $$->ret_name = newTemp;
+        $$->r_type = newTemp;
       }
-      else if ($1->ret_name == "num") {
+      else if ($1->r_type == "num") {
         $$->code = $1->code;
-        $$->ret_name = "";
+        $$->r_type = "";
       }
       else {
         $$->code = $1->code;
-        $$->ret_name = $1->ret_name;
+        $$->r_type = $1->r_type;
       }
     }
   | SUB TermInner
@@ -866,7 +866,7 @@ Term: TermInner
       stringstream ss;
       string subTemp = makeTemp();
 
-      if ($2->ret_name == "var") {
+      if ($2->r_type == "var") {
         string newTemp = makeTemp();
         
         if ($2->isArray) {
@@ -887,14 +887,14 @@ Term: TermInner
         ss << "- " << subTemp << ", 0, " << newTemp;
 
         $$->code = ss.str();
-        $$->ret_name = subTemp;
+        $$->r_type = subTemp;
       }
       else {
         ss << ". " << subTemp << endl;
         ss << "- " << subTemp << ", 0, " << $2->code;
 
         $$->code = ss.str();
-        $$->ret_name = subTemp;
+        $$->r_type = subTemp;
       }
     }
   | Identifier L_PAREN ExpressionList R_PAREN
@@ -905,13 +905,13 @@ Term: TermInner
 
       ss << $3->code << endl; 
       string temp;
-      for (int i = 0; i < $3->ret_name.length(); i++) {
-        if ($3->ret_name[i] == ',') {
+      for (int i = 0; i < $3->r_type.length(); i++) {
+        if ($3->r_type[i] == ',') {
           sret << "param " << temp << endl;
           temp = "";
           continue;
         }
-        temp.push_back($3->ret_name[i]);
+        temp.push_back($3->r_type[i]);
       }
 
       if (temp.length() > 0) { 
@@ -923,14 +923,14 @@ Term: TermInner
       ss << "call " << $1->code << ", " << newTemp;
 
       $$->code = ss.str();
-      $$->ret_name = newTemp;
+      $$->r_type = newTemp;
     }
   ;
 TermInner: Var
     {
       $$ = new n_Terminal();
       $$->code = $1->code;
-      $$->ret_name = "var";
+      $$->r_type = "var";
       $$->isArray = $1->isArray;
       $$->var = $1->var;
       $$->index = $1->index;
@@ -939,7 +939,7 @@ TermInner: Var
     {
       $$ = new n_Terminal();
       $$->code = to_string($1);
-      $$->ret_name = "num";
+      $$->r_type = "num";
     }
   | L_PAREN Expression R_PAREN
     {
@@ -948,7 +948,7 @@ TermInner: Var
 
       ss << $2->code; 
       $$->code = ss.str();
-      $$->ret_name = $2->ret_name;
+      $$->r_type = $2->r_type;
     }
   ;
 
@@ -983,9 +983,9 @@ Var: Identifier
       stringstream ss;
       string index, code = "";
 
-      if ($3->ret_name != "") {
+      if ($3->r_type != "") {
         code = $3->code;
-        index = $3->ret_name;
+        index = $3->r_type;
       }
       else {
         index = $3->code; 
