@@ -25,6 +25,7 @@
   string makeTemp();
   string makeLabel();
   string createVar(char*);
+  string findIndex (const string&);
   void replaceString(string&, const string&, const string&);
   bool varDeclared(const vector<string>&, const string&);
   void addLocalVar(const string&);
@@ -1045,11 +1046,22 @@ string createVar(char* ident) {
   return newVar;
 }
 
-void replaceString(string& str, const string& old, const string& new) {
+string findIndex (const string &ref) {
+  int leftB = ref.find('[');
+  if (leftB != string::npos) {
+    int indexLength = ((ref.length() - 1) - leftB) - 1;
+    return ref.substr(leftB + 1, indexLength);
+  }
+  else {
+    exit(1);
+  }
+}
+
+void replaceString(string& str, const string& oldStr, const string& newStr) {
   string::size_type pos = 0u;
-  while((pos = str.find(old, pos)) != string::npos){
-     str.replace(pos, old.length(), new);
-     pos += new.length();
+  while((pos = str.find(oldStr, pos)) != string::npos){
+     str.replace(pos, oldStr.length(), newStr);
+     pos += newStr.length();
   }
 }
 
@@ -1065,7 +1077,7 @@ bool varDeclared(const vector<string>& symbolTable, const string& var) {
 void addLocalVar(const string& var) {
   for (int i = 0; i < declaredVar.size(); i++) {
     if (declaredVar.at(i) == var) {
-      string e = "symbol \"" + var + "\" is not defined.";
+      string e = "symbol \"" + var + "\" is defined.";
       yyerror(e);
     }
   }
