@@ -543,24 +543,24 @@ Relations: Expression Comp Expression
       $$ = new n_Terminal();
       string compResult = createTemp();
       stringstream ss;
-      string firstOp;
+      string operator_1;
 
       if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->r_type;
+        operator_1 = $1->r_type;
 
       }
       else {
-        firstOp = $1->code; 
+        operator_1 = $1->code; 
       }
 
       if ($3->r_type != "") {
         ss << $3->code << endl << ". " << compResult << endl;
-        ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->r_type;  
+        ss << $2 << " " << compResult << ", " << operator_1 << ", " << $3->r_type;  
       }
       else {
         ss << ". " << compResult << endl;
-        ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->code;
+        ss << $2 << " " << compResult << ", " << operator_1 << ", " << $3->code;
       }
 
       $$->code = ss.str();
@@ -610,25 +610,25 @@ Expression: Expression ADD MultiplicativeExpr
       $$ = new n_Terminal();
       string add_result = createTemp();
       stringstream ss;
-      string firstOp;
+      string operator_1;
 
       if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->r_type;
+        operator_1 = $1->r_type;
 
       }
       else {
-        firstOp = $1->code; 
+        operator_1 = $1->code; 
       }
 
 
       if ($3->r_type != "") {
         ss << $3->code << endl << ". " << add_result << endl;
-        ss << "+ " << add_result << ", " << firstOp << ", " << $3->r_type;  
+        ss << "+ " << add_result << ", " << operator_1 << ", " << $3->r_type;  
       }
       else {
         ss << ". " << add_result << endl;
-        ss << "+ " << add_result << ", " << firstOp << ", " << $3->code;
+        ss << "+ " << add_result << ", " << operator_1 << ", " << $3->code;
       }
 
       $$->code = ss.str();
@@ -639,25 +639,25 @@ Expression: Expression ADD MultiplicativeExpr
       $$ = new n_Terminal();
       string subResult = createTemp();
       stringstream ss;
-      string firstOp;
+      string operator_1;
 
       if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->r_type;
+        operator_1 = $1->r_type;
 
       }
       else {
-        firstOp = $1->code; 
+        operator_1 = $1->code; 
       }
 
 
       if ($3->r_type != "") {
         ss << $3->code << endl << ". " << subResult << endl;
-        ss << "- " << subResult << ", " << firstOp << ", " << $3->r_type;  
+        ss << "- " << subResult << ", " << operator_1 << ", " << $3->r_type;  
       }
       else {
         ss << ". " << subResult << endl;
-        ss << "- " << subResult << ", " << firstOp << ", " << $3->code;
+        ss << "- " << subResult << ", " << operator_1 << ", " << $3->code;
       }
 
       $$->code = ss.str();
@@ -700,26 +700,26 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       $$ = new n_Terminal();
       string multResult = createTemp();
       stringstream ss;
-      string firstOp;
+      string operator_1;
 
       if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->r_type;
+        operator_1 = $1->r_type;
 
       }
       else {
-        firstOp = $1->code; 
+        operator_1 = $1->code; 
       }
 
 
       if ($3->r_type != "") {
         ss << $3->code << endl;
         ss << ". " << multResult << endl;
-        ss << "* " << multResult << ", " << firstOp << ", " << $3->r_type;  
+        ss << "* " << multResult << ", " << operator_1 << ", " << $3->r_type;  
       }
       else {
         ss << ". " << multResult << endl;
-        ss << "* " << multResult << ", " << firstOp << ", " << $3->code;
+        ss << "* " << multResult << ", " << operator_1 << ", " << $3->code;
       }
 
       $$->code = ss.str();
@@ -730,26 +730,26 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       $$ = new n_Terminal();
       string divResult = createTemp();
       stringstream ss;
-      string firstOp;
+      string operator_1;
 
       if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->r_type;
+        operator_1 = $1->r_type;
 
       }
       else {
-        firstOp = $1->code;
+        operator_1 = $1->code;
       }
 
 
       if ($3->r_type != "") {
         ss << $3->code << endl;
         ss << ". " << divResult << endl;
-        ss << "/ " << divResult << ", " << firstOp << ", " << $3->r_type;  
+        ss << "/ " << divResult << ", " << operator_1 << ", " << $3->r_type;  
       }
       else {
         ss << ". " << divResult << endl;
-        ss << "/ " << divResult << ", " << firstOp << ", " << $3->code;
+        ss << "/ " << divResult << ", " << operator_1 << ", " << $3->code;
       }
 
       $$->code = ss.str();
@@ -760,25 +760,25 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       $$ = new n_Terminal();
       string modResult = createTemp();
       stringstream ss;
-      string firstOp;
+      string operator_1;
 
       if ($1->r_type != "") {
         ss << $1->code << endl;
-        firstOp = $1->r_type;
+        operator_1 = $1->r_type;
 
       }
       else {
-        firstOp = $1->code; 
+        operator_1 = $1->code; 
       }
 
 
       if ($3->r_type != "") {
         ss << $3->code << endl << ". " << modResult << endl;
-        ss << "% " << modResult << ", " << firstOp << ", " << $3->r_type;  
+        ss << "% " << modResult << ", " << operator_1 << ", " << $3->r_type;  
       }
       else {
         ss << ". " << modResult << endl;
-        ss << "% " << modResult << ", " << firstOp << ", " << $3->code;
+        ss << "% " << modResult << ", " << operator_1 << ", " << $3->code;
       }
 
       $$->code = ss.str();
