@@ -25,7 +25,6 @@
   string makeTemp();
   string makeLabel();
   string createVar(char*);
-  string findIndex (const string&);
   void replaceString(string&, const string&, const string&);
   bool varDeclared(const vector<string>&, const string&);
   void addLocalVar(const string&);
@@ -1046,22 +1045,11 @@ string createVar(char* ident) {
   return newVar;
 }
 
-string findIndex (const string &ref) {
-  int leftB = ref.find('[');
-  if (leftB != string::npos) {
-    int indexLength = ((ref.length() - 1) - leftB) - 1;
-    return ref.substr(leftB + 1, indexLength);
-  }
-  else {
-    exit(1);
-  }
-}
-
-void replaceString(string& str, const string& oldStr, const string& newStr) {
+void replaceString(string& str, const string& old, const string& new) {
   string::size_type pos = 0u;
-  while((pos = str.find(oldStr, pos)) != string::npos){
-     str.replace(pos, oldStr.length(), newStr);
-     pos += newStr.length();
+  while((pos = str.find(old, pos)) != string::npos){
+     str.replace(pos, old.length(), new);
+     pos += new.length();
   }
 }
 
@@ -1077,8 +1065,8 @@ bool varDeclared(const vector<string>& symbolTable, const string& var) {
 void addLocalVar(const string& var) {
   for (int i = 0; i < declaredVar.size(); i++) {
     if (declaredVar.at(i) == var) {
-      string errorString = "symbol \"" + var + "\" is multiply-defined.";
-      yyerror(errorString);
+      string e = "symbol \"" + var + "\" is not defined.";
+      yyerror(e);
     }
   }
   declaredVar.push_back(var);
@@ -1090,15 +1078,15 @@ void checkDeclared(const string& var) {
       return;
     }
   }
-  string err = "used variable \"" + var + "\" was not previously declared.";
-  yyerror(err);
+  string e = "The variable \"" + var + "\" wasn't declared.";
+  yyerror(e);
 }
 
 void addFunction(const string& func) {
   for (int i = 0; i < declaredFunc.size(); i++) {
     if (declaredFunc.at(i) == func) {
-      string errorString = "function \"" + func + "\" is multiply-defined.";
-      yyerror(errorString);
+      string e= "function \"" + func + "\" is not defined";
+      yyerror(e);
     }
   }
   declaredFunc.push_back(func);
