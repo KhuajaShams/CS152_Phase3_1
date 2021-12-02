@@ -1118,16 +1118,14 @@ void checkFuncDeclared(const string& func) {
       return;
     }
   }
-  string err = "called function \"" + func + "\" was not previously declared.";
+  string err = "function \"" + func + "\" wasn't declared.";
   yyerror(err);
 }
 
 int yyerror(string s) {
   extern int currLine, currPos;
-  extern char *yytext;
-
-  cout << "Error line: " << currLine << ": " << s << endl;
-  exit(1);
+  printf("Error on line %d, position %d: %s\n",currLine, currPos, s);
+  return -1;
 }
 
 int yyerror(char* s) {
