@@ -110,9 +110,9 @@ Program: FunctionList
 FunctionList: Function FunctionList
     {
       $$ = new nonTerm();
-      stringstream ss;
-      ss << $1->code << endl << $2->code;
-      $$->code = ss.str();
+      string s;
+      s = $1->code + endl + $2->code;
+      $$->code = s;
     }
   | Function
     {
