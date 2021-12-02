@@ -97,18 +97,14 @@
 /* Program */
 Program: FunctionList
     {
-      $$ = new nonTerm();
       if (!mainCheck) {
         yyerror("\"main\" function not definied in program.");
       }
-
-      $$->code = $1->code;
-      cout << $$->code << endl;
+      string s = $1->code;
+      cout << s << endl;
     }
   | %empty 
     {
-      $$ = new nonTerm();
-      cout << $$->code << endl;
     }
   ;
 FunctionList: Function FunctionList
