@@ -1,6 +1,6 @@
 %code requires{
-  #include<string>
   using namespace std;
+  #include<string>
   
   struct n_Terminal {
     string code;
