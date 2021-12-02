@@ -1124,8 +1124,8 @@ void checkFuncDeclared(const string& func) {
 
 int yyerror(string s) {
   extern int currLine, currPos;
-  printf("Error on line %d, position %d: %s\n",currLine, currPos, s);
-  return -1;
+  cout << "Error on line " << currLine << "position " << currPos << " " <<s;
+  exit(1);
 }
 
 int yyerror(char* s) {
