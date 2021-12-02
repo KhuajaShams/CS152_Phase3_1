@@ -356,7 +356,7 @@ Statement: Var ASSIGN Expression
       string replaceContinue = ":= " + conLabel;
       replaceString($4->code, "continue", replaceContinue);
 
-      ss << ": " << conLabel << endl <<<< $2->code << endl; 
+      ss << ": " << conLabel << endl << $2->code << endl; 
       ss << "?:= " << newLabel << ", " << $2->r_type << endl; 
       ss << ":= " << endLabel << endl << ": " << newLabel << endl;
       ss << $4->code << endl << ":= " << conLabel << endl; 
