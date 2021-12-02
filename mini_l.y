@@ -5,7 +5,7 @@
   struct n_Terminal {
     string code;
     string r_type;
-    bool isArray;
+    bool boolArray;
     string var;
     string index;
   };
@@ -175,6 +175,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
 FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
     {
       $$ = new n_Terminal();
+
       $$->code = $2->code;
     }
   | BEGIN_LOCALS END_LOCALS {
@@ -310,7 +311,7 @@ Statement: Var ASSIGN Expression
         assign = $3->code;
       }
 
-      if ($1->isArray) {
+      if ($1->boolArray) {
         if ($1->code.length() > 0) {
           ss << $1->code << endl;
         }
@@ -831,7 +832,7 @@ Term: TermInner
         string newTemp = makeTemp();
         stringstream ss;
         
-        if ($1->isArray) {
+        if ($1->boolArray) {
           if ($1->code.length() > 0) {
             ss << $1->code << endl;
           }
@@ -865,7 +866,7 @@ Term: TermInner
       if ($2->r_type == "var") {
         string newTemp = makeTemp();
         
-        if ($2->isArray) {
+        if ($2->boolArray) {
           if ($2->code.length() > 0) {
             ss << $2->code << endl;
           }
@@ -927,7 +928,7 @@ TermInner: Var
       $$ = new n_Terminal();
       $$->code = $1->code;
       $$->r_type = "var";
-      $$->isArray = $1->isArray;
+      $$->boolArray = $1->boolArray;
       $$->var = $1->var;
       $$->index = $1->index;
     }
@@ -951,11 +952,6 @@ TermInner: Var
 /* Var */
 Var: Identifier
     {  
-      /* 
-        Error 6 of 9: 
-        Forgetting to specify an array index when using an array variable 
-        (i.e., trying to use an array variable as a regular integer variable).
-      */
 
       $$ = new n_Terminal();
       stringstream ss;
@@ -965,16 +961,10 @@ Var: Identifier
 
       $$->code = ss.str();
       $$->var = ss.str();
-      $$->isArray = false;
+      $$->boolArray = false;
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
-      /* 
-        Error 7 of 9: 
-        Specifying an array index when using a regular integer variable 
-        (i.e., trying to use a regular integer variable as an array variable).
-      */
-      
       $$ = new n_Terminal();
       stringstream ss;
       string index, code = "";
@@ -992,7 +982,7 @@ Var: Identifier
       checkDeclared(ss.str());
 
       $$->code = code;
-      $$->isArray = true;
+      $$->boolArray = true;
       $$->var = ss.str();
       $$->index = index;
     }
@@ -1002,7 +992,7 @@ VarList: Var
       $$ = new n_Terminal();
       stringstream ss;
       $$->code = $1->var;
-      $$->isArray = $1->isArray;
+      $$->boolArray = $1->boolArray;
     }
   | Var COMMA VarList
     {
@@ -1011,10 +1001,10 @@ VarList: Var
       ss << $1->var << "," << $3->code;
       $$->code = ss.str();
 
-      if ($1->isArray != $3->isArray) {
+      if ($1->boolArray != $3->boolArray) {
         stringstream er;
         er << "variable \"" << $1->code << "\" is of type ";
-        if ($1->isArray) {
+        if ($1->boolArray) {
           er << "array.";
         }
         else {
@@ -1023,7 +1013,7 @@ VarList: Var
 
         yyerror(er.str());
       }
-      $$->isArray = $1->isArray;
+      $$->boolArray = $1->boolArray;
     }
   ;
 
