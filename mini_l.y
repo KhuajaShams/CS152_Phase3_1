@@ -26,7 +26,6 @@
   string makeLabel();
   string createVar(char*);
   string findIndex (const string&);
-  bool continueCheck (const string &ref);
   void replaceString(string&, const string&, const string&);
   bool varDeclared(const vector<string>&, const string&);
   void addLocalVar(const string&);
@@ -188,7 +187,8 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
   ;
 FunctionBody: BEGIN_BODY StatementList END_BODY
     {
-      if (continueCheck($2->code)) {
+
+      if ($2->code.find("continue") == string::npos) {
         cout << "Error: continue statement not within a loop." << endl;
         exit(1);
       }
@@ -1056,13 +1056,6 @@ string findIndex (const string &ref) {
   else {
     exit(1);
   }
-}
-
-bool continueCheck (const string &ref) {
-  if (ref.find("continue") == string::npos) {
-    return false;
-  }
-  return true;
 }
 
 void replaceString(string& str, const string& oldStr, const string& newStr) {
