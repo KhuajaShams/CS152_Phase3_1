@@ -152,7 +152,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
       int paramNum = 0;
       for (int i = 0; i < $2->r_type.length(); i++) {
         if ($2->r_type[i] == ',') {
-          ss << "= " << ident << ", $" << str(paramNum) << endl;
+          ss << "= " << ident << ", $" << to_string(paramNum) << endl;
           ident = "";
           paramNum++;
           continue;
@@ -161,7 +161,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
       }
 
       if (ident.length() > 0) {
-        ss << "= " << ident << ", $" << str(paramNum);
+        ss << "= " << ident << ", $" << to_string(paramNum);
       }
 
 
@@ -255,7 +255,7 @@ Declaration: IdentifierList COLON INTEGER
 
       for (int i = 0; i < $1->code.length(); i++) {
         if ($1->code.at(i) == ',') {
-          ss << ".[] " << currVar << ", " << str($5) << endl;
+          ss << ".[] " << currVar << ", " << to_string($5) << endl;
           addNewVar(currVar);
           currVar = "";
         }
@@ -265,7 +265,7 @@ Declaration: IdentifierList COLON INTEGER
       }
 
       if (currVar.length() > 0 ) {
-        ss << ".[] " << currVar << ", " << str($5);
+        ss << ".[] " << currVar << ", " << to_string($5);
         addNewVar(currVar);
       }
       
@@ -934,7 +934,7 @@ TermInner: Var
   | NUMBER
     {
       $$ = new n_Terminal();
-      $$->code = str($1);
+      $$->code = to_string($1);
       $$->r_type = "num";
     }
   | L_PAREN Expression R_PAREN
@@ -1030,12 +1030,12 @@ VarList: Var
 %%
 string makeTemp() {
   static int tempNum = 0;
-  return "__temp__" + str(tempNum++);
+  return "__temp__" + to_string(tempNum++);
 }
 
 string createLabel() {
   static int labelNum = 0;
-  return "__label__" + str(labelNum++);
+  return "__label__" + to_string(labelNum++);
 }
 
 
